@@ -46,7 +46,7 @@
   async function allMedia(){const db=await openDB();return new Promise((res,rej)=>{const req=db.transaction('media').objectStore('media').getAll();req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error);});}
   async function deleteMedia(id){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction('media','readwrite');tx.objectStore('media').delete(id);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
   async function clearMedia(){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction('media','readwrite');tx.objectStore('media').clear();tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
-  async function renderAvatar(){if(avatarURL){URL.revokeObjectURL(avatarURL);avatarURL=null;}const rec=await getMedia('avatar');const el=$('avatarDisplay');el.replaceChildren();if(rec?.blob){avatarURL=URL.createObjectURL(rec.blob);const img=document.createElement('img');img.src=avatarURL;img.alt='Фото профиля';el.append(img);}else if (telegramData?.connected && /^assets\/telegram\/[a-zA-Z0-9_.-]+$/.test(telegramData.avatar || '')) { const img=document.createElement('img');img.src=telegramData.avatar+'?v='+encodeURIComponent(telegramData.synced_at||'');img.alt='Аватар профиля';el.append(img); }else{const img=document.createElement('img');img.src='assets/profile-avatar.jpg';img.alt='Фото профиля';el.append(img);}}
+  async function renderAvatar(){if(avatarURL){URL.revokeObjectURL(avatarURL);avatarURL=null;}const rec=await getMedia('avatar');const el=$('avatarDisplay');el.replaceChildren();if(rec?.blob){avatarURL=URL.createObjectURL(rec.blob);const img=document.createElement('img');img.src=avatarURL;img.alt='Фото профиля';el.append(img);}else if (telegramData?.connected && (telegramData.avatar==='/api/telegram-avatar' || /^assets\/telegram\/[a-zA-Z0-9_.-]+$/.test(telegramData.avatar || ''))) { const img=document.createElement('img');img.src=telegramData.avatar+'?v='+encodeURIComponent(telegramData.synced_at||'');img.alt='Аватар профиля';el.append(img); }else{const img=document.createElement('img');img.src='assets/profile-avatar.jpg';img.alt='Фото профиля';el.append(img);}}
   async function renderGallery(){galleryURLs.forEach(u=>URL.revokeObjectURL(u));galleryURLs=[];const recs=(await allMedia()).filter(o=>o.id!=='avatar').sort((a,b)=>b.created-a.created);$('galleryEmpty').hidden=recs.length>0;$('galleryGrid').replaceChildren(...recs.map(rec=>{
     const article=document.createElement('div');article.className='gallery-item';const img=document.createElement('img');const url=URL.createObjectURL(rec.blob);galleryURLs.push(url);img.src=url;img.alt=rec.name||'Изображение из галереи';img.loading='lazy';const button=document.createElement('button');button.className='gallery-remove';button.type='button';button.textContent='×';button.title='Удалить фотографию';button.setAttribute('aria-label',`Удалить ${rec.name||'фото'}`);button.addEventListener('click',async()=>{if(confirm('Удалить это изображение из галереи?')){await deleteMedia(rec.id);await renderGallery();toast('Изображение удалено');}});article.append(img,button);return article;
   }));}
@@ -84,9 +84,15 @@
   }
   async function loadTelegram() {
     try {
-      const response=await fetch('telegram-data.json?ts='+Date.now(),{cache:'no-store'});
-      if(!response.ok) throw new Error('Not connected');
-      const json=await response.json();
+      let json;
+      for (const url of ['/api/telegram','telegram-data.json']) {
+        try {
+          const response=await fetch(url+'?ts='+Date.now(),{cache:'no-store'});
+          if(!response.ok) continue;
+          const candidate=await response.json();
+          if(candidate?.connected===true && Array.isArray(candidate.tracks)){json=candidate;break;}
+        } catch (_) {}
+      }
       if(!json || json.connected!==true || !Array.isArray(json.tracks)) throw new Error('Invalid data');
       telegramData=json;
       $('musicHint').textContent='✦ Telegram profile music · обновляется автоматически';
