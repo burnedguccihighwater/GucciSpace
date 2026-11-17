@@ -72,7 +72,11 @@
 <div class="music-body">
 <p class="music-intro">the soundtrack to my little corner of the internet ✧</p>
 <div aria-live="polite" class="track-list" id="tracksList"><div class="music-empty">✧ треки появятся здесь после подключения Telegram</div></div>
-<audio controls="" hidden="" id="trackAudio" preload="none"></audio>
+<div class="music-player" id="musicPlayer" hidden>
+  <div class="now-playing"><span>✦ NOW PLAYING</span><strong id="playerNowTitle"></strong><small id="playerNowArtist"></small></div>
+  <div class="player-controls"><button id="playerPrev" type="button" aria-label="Предыдущий трек">|◀</button><button id="playerToggle" type="button" aria-label="Воспроизвести">▶</button><button id="playerNext" type="button" aria-label="Следующий трек">▶|</button></div>
+  <div class="player-timeline"><span id="playerElapsed">0:00</span><input id="playerSeek" type="range" min="0" max="1000" value="0" aria-label="Позиция воспроизведения"/><span id="playerTotal">0:00</span></div>
+</div><audio hidden id="trackAudio" preload="none"></audio>
 </div>
 </section>
 <section class="panel gallery-panel" id="gallery">

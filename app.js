@@ -58,30 +58,45 @@
   async function exportBackup(){try{const rows=await allMedia();const media=[];for(const rec of rows){media.push({id:rec.id,name:rec.name||'',created:rec.created||0,data:await mediaToDataURL(rec.blob)});}const data=JSON.stringify({version:1,profile,media},null,2);const blob=new Blob([data],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='my-space-backup.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);$('editFeedback').textContent='Резервная копия скачана ♡';}catch(e){console.error(e);$('editFeedback').textContent='Не удалось создать копию.';}}
   async function importBackup(file){try{if(file.size>80*1024*1024)throw Error('Too big');const data=JSON.parse(await file.text());if(data?.version!==1||!data.profile||!Array.isArray(data.media))throw Error('Invalid backup');const restored=safeProfile(data.profile);const rows=data.media.map(rec=>({id:rec.id,name:String(rec.name||''),created:Number(rec.created)||Date.now(),blob:dataURLToBlob(rec.data)}));await clearMedia();for(const rec of rows)await putMedia(rec);profile=restored;localStorage.setItem(key,JSON.stringify(profile));renderProfile();renderTracks();await Promise.all([renderGallery(),renderAvatar()]);hideEditor();toast('Страничка восстановлена из копии ♡');}catch(e){console.error(e);$('editFeedback').textContent='Не удалось открыть копию. Проверь файл JSON.';}}
 
-  function validAudio(src) { return typeof src==='string' && /^assets\/telegram\/[a-zA-Z0-9_.-]+\.(mp3|ogg|m4a|aac|wav)$/i.test(src); }
-  function renderTracks() {
-    const list=$('tracksList'); const tracks=telegramData?.connected && Array.isArray(telegramData.tracks) ? telegramData.tracks.slice(0,15) : [];
-    $('trackCount').textContent=tracks.length+' tracks';
-    $('featuredTrack').textContent=tracks[0]?.title || profile.music || 'no tracks yet';
-    $('displayMusic').textContent=tracks[0]?.title || profile.music || '—';
-    list.replaceChildren();
-    if (!tracks.length){const empty=document.createElement('div');empty.className='music-empty';empty.textContent='✧ Треки появятся после подключения синхронизации с профилем Telegram.';list.append(empty);return;}
-    for (let i=0;i<tracks.length;i++) {
-      const track=tracks[i];
-      const row=document.createElement('div');row.className='track-row';
-      const number=document.createElement('span');number.className='track-number';number.textContent=String(i+1).padStart(2,'0');
-      const info=document.createElement('div');info.className='track-info';
-      const title=document.createElement('strong');title.textContent=String(track.title||'Unknown track').slice(0,120);
-      const artist=document.createElement('small');artist.textContent=String(track.artist||'Unknown artist').slice(0,120);
-      info.append(title,artist);row.append(number,info);
-      const duration=document.createElement('span');duration.className='track-duration';const d=Number(track.duration)||0;duration.textContent=d>0?`${Math.floor(d/60)}:${String(d%60).padStart(2,'0')}`:'♫';row.append(duration);
-      if (validAudio(track.src)) {
-        const play=document.createElement('button');play.type='button';play.className='track-play';play.textContent='▶';play.title='Воспроизвести '+title.textContent;
-        play.addEventListener('click',()=>{const audio=$('trackAudio');audio.hidden=false;audio.src=track.src;audio.play().catch(()=>toast('Не удалось воспроизвести трек'));$('featuredTrack').textContent=title.textContent;});row.append(play);
-      }
-      list.append(row);
-    }
+  function validAudio(src){return typeof src==='string' && (/^\/api\/telegram-media\?kind=audio&id=[a-f0-9]{32}$/.test(src)||/^assets\/telegram\/[a-zA-Z0-9_.-]+\.(mp3|ogg|m4a|aac|wav)$/i.test(src));}
+  function validCover(src){return typeof src==='string' && /^\/api\/telegram-media\?kind=cover&id=[a-f0-9]{32}$/.test(src);}
+  let currentTrack=null,playlist=[];
+  const timeLabel=s=>Number.isFinite(s)&&s>=0?Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0'):'0:00';
+  function syncPlayer(){
+    const a=$('trackAudio'),active=!!currentTrack,playing=active&&!a.paused;
+    $('musicPlayer').hidden=!active;
+    $('playerToggle').textContent=playing?'Ⅱ':'▶';$('playerToggle').setAttribute('aria-label',playing?'Пауза':'Воспроизвести');
+    $('playerNowTitle').textContent=currentTrack?.title||'';
+    $('playerNowArtist').textContent=currentTrack?.artist||'';
+    $('playerElapsed').textContent=timeLabel(a.currentTime);$('playerTotal').textContent=timeLabel(Number.isFinite(a.duration)?a.duration:Number(currentTrack?.duration)||0);
+    $('playerSeek').value=Number.isFinite(a.duration)&&a.duration>0?String(Math.round(a.currentTime/a.duration*1000)):'0';
+    $('playerSeek').disabled=!Number.isFinite(a.duration)||a.duration<=0;
+    if(active)$('featuredTrack').textContent=currentTrack.title||'Unknown track';
+    document.querySelectorAll('.track-play[data-src]').forEach(b=>{const selected=b.dataset.src===currentTrack?.src;b.textContent=selected&&playing?'Ⅱ':'▶';b.setAttribute('aria-label',selected&&playing?'Пауза':'Воспроизвести');b.closest('.track-row')?.classList.toggle('track-active',selected);});
   }
+  function playTrack(t){if(!t||!validAudio(t.src))return;const a=$('trackAudio');
+    if(currentTrack?.src===t.src){if(a.paused)a.play().catch(()=>toast('Не удалось воспроизвести трек'));else a.pause();return;}
+    currentTrack=t;a.src=t.src;syncPlayer();a.play().catch(()=>toast('Не удалось воспроизвести трек'));
+  }
+  function moveTrack(dir){const available=playlist.filter(t=>validAudio(t.src));if(!available.length)return;const i=available.findIndex(t=>t.src===currentTrack?.src);const n=i<0?0:i+dir;if(n>=0&&n<available.length)playTrack(available[n]);}
+  function renderTracks(){
+    const list=$('tracksList');playlist=telegramData?.connected&&Array.isArray(telegramData.tracks)?telegramData.tracks.slice(0,15):[];
+    $('trackCount').textContent=playlist.length+' tracks';
+    $('featuredTrack').textContent=currentTrack?.title||playlist[0]?.title||profile.music||'no tracks yet';
+    $('displayMusic').textContent=playlist[0]?.title||profile.music||'—';
+    list.replaceChildren();
+    if(!playlist.length){const empty=document.createElement('div');empty.className='music-empty';empty.textContent='✧ Треки появятся после подключения синхронизации с профилем Telegram.';list.append(empty);syncPlayer();return;}
+    for(const track of playlist){
+      const row=document.createElement('div');row.className='track-row';
+      const art=document.createElement('div');art.className='track-cover';art.textContent='♫';
+      if(validCover(track.cover)){const img=document.createElement('img');img.src=track.cover;img.alt='';img.loading='lazy';img.addEventListener('error',()=>img.remove());art.append(img);}
+      const info=document.createElement('div');info.className='track-info';const title=document.createElement('strong');title.textContent=String(track.title||'Unknown track').slice(0,120);const artist=document.createElement('small');artist.textContent=String(track.artist||'Unknown artist').slice(0,120);info.append(title,artist);row.append(art,info);
+      const duration=document.createElement('span');duration.className='track-duration';duration.textContent=timeLabel(Number(track.duration)||0);row.append(duration);
+      const play=document.createElement('button');play.type='button';play.className='track-play';play.textContent='▶';play.disabled=!validAudio(track.src);play.title=play.disabled?'Аудиофайл недоступен':'Воспроизвести '+title.textContent;play.setAttribute('aria-label',play.title);
+      if(!play.disabled){play.dataset.src=track.src;play.addEventListener('click',()=>playTrack(track));}row.append(play);list.append(row);
+    }syncPlayer();
+  }
+  function initPlayer(){const a=$('trackAudio');for(const event of ['play','pause','timeupdate','durationchange','loadedmetadata'])a.addEventListener(event,syncPlayer);a.addEventListener('ended',()=>{syncPlayer();moveTrack(1);});a.addEventListener('error',()=>{syncPlayer();toast('Этот аудиофайл не удалось загрузить');});$('playerToggle').addEventListener('click',()=>playTrack(currentTrack));$('playerPrev').addEventListener('click',()=>moveTrack(-1));$('playerNext').addEventListener('click',()=>moveTrack(1));$('playerSeek').addEventListener('input',()=>{if(Number.isFinite(a.duration))a.currentTime=Number($('playerSeek').value)*a.duration/1000;});}
   async function loadTelegram() {
     try {
       let json;
@@ -106,7 +121,7 @@
     }
   }
 
-  async function init(){renderProfile();$('year').textContent=new Date().getFullYear();
+  async function init(){initPlayer();renderProfile();$('year').textContent=new Date().getFullYear();
     $('editOpen').addEventListener('click',showEditor);$('editClose').addEventListener('click',hideEditor);$('editorBackdrop').addEventListener('click',e=>{if(e.target===$('editorBackdrop'))hideEditor();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('editorBackdrop').hidden)hideEditor();});
     $('editForm').addEventListener('submit',e=>{e.preventDefault();const next={};for(const field of Object.keys(defaultProfile)){const input=$('edit'+field[0].toUpperCase()+field.slice(1));next[field]=(input?.value||'').trim();}profile=next;useTelegramBio=$('syncBioToggle').checked;localStorage.setItem('gucci-space-use-tg-bio',String(useTelegramBio));localStorage.setItem(key,JSON.stringify(profile));renderProfile();renderTracks();hideEditor();toast('Изменения сохранены ♡');});
     $('galleryAdd').addEventListener('click',()=>$('galleryInput').click());$('galleryEmptyAdd').addEventListener('click',()=>$('galleryInput').click());$('galleryInput').addEventListener('change',async e=>{await addImages(e.target.files);e.target.value='';});
