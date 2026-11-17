@@ -4,9 +4,9 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="theme-color" content="#050505"/>
-<meta name="description" content="Gucci Space — музыка, фотографии и мой уголок интернета."/>
+<meta name="description" content="Gucci Space — музыка, фотографии, игры и мой уголок интернета."/>
 <title>Gucci's Space ☆</title>
-<link rel="stylesheet" href="style.css?v=acid-1"/>
+<link rel="stylesheet" href="style.css?v=steam-1"/>
 </head>
 <body>
 <div class="global-sky" aria-hidden="true"></div>
@@ -23,6 +23,7 @@
 <a class="nav-link" href="#about">About</a>
 <a class="nav-link" href="#gallery">Photos</a>
 <a class="nav-link" href="#music">Music</a>
+<a class="nav-link" href="#games">Games</a>
 <button class="edit-nav" id="editOpen" type="button">✎ Edit my space</button>
 </nav>
 </header>
@@ -40,7 +41,7 @@
 <div><span>Location:</span><b id="displayLocation">internet</b></div>
 <div><span>Listening to:</span><b id="displayMusic">my playlist</b></div>
 </div>
-<div class="profile-shortcuts">View my: <a href="#gallery">Pics</a><span>|</span><a href="#music">Music</a><span>|</span><a href="#about">About</a></div>
+<div class="profile-shortcuts">View my: <a href="#gallery">Pics</a><span>|</span><a href="#music">Music</a><span>|</span><a href="#games">Games</a><span>|</span><a href="#about">About</a></div>
 </div>
 </section>
 <section class="panel currently-panel">
@@ -72,6 +73,21 @@
 <div class="player-controls"><button id="playerPrev" type="button" aria-label="Предыдущий трек">|◀</button><button id="playerToggle" type="button" aria-label="Воспроизвести">▶</button><button id="playerNext" type="button" aria-label="Следующий трек">▶|</button></div>
 <div class="player-timeline"><span id="playerElapsed">0:00</span><input id="playerSeek" type="range" min="0" max="1000" value="0" aria-label="Позиция воспроизведения"/><span id="playerTotal">0:00</span></div>
 </div><audio id="trackAudio" preload="none" hidden></audio>
+</div>
+</section>
+<section class="panel games-panel" id="games" aria-labelledby="gamesHeading">
+<div class="panel-title"><span id="gamesHeading">Gucci's games</span><span class="music-count" id="gamesCount">Steam</span></div>
+<div class="games-body" id="gamesPanelBody" aria-busy="true">
+<div class="steam-profile-line"><span>my Steam library</span><a href="https://steamcommunity.com/id/bleed4gucci/" target="_blank" rel="noopener noreferrer"><span id="steamProfileName">bleed4gucci</span> ↗</a></div>
+<div class="games-summary"><div><strong id="gamesTotal">—</strong><span>игр в библиотеке</span></div><div><strong id="gamesHours">—</strong><span>время в играх</span></div></div>
+<div class="games-controls" id="gamesControls">
+<div class="games-search-row"><label class="games-search-label">Найти игру<input id="gamesSearch" type="search" placeholder="Название игры…" maxlength="120" disabled/></label><label class="games-sort-label">Порядок<select id="gamesSort" disabled><option value="playtime">Больше всего играл</option><option value="recent">Недавно запускал</option><option value="name">По названию</option></select></label></div>
+<div class="games-filters" role="group" aria-label="Фильтр игр"><button type="button" data-games-filter="all" aria-pressed="true" disabled>Все игры</button><button type="button" data-games-filter="played" aria-pressed="false" disabled>Играл</button><button type="button" data-games-filter="unplayed" aria-pressed="false" disabled>Не запускал</button></div>
+</div>
+<div class="games-grid" id="gamesGrid"></div>
+<div class="games-empty" id="gamesEmpty" role="status"><span aria-hidden="true">[ ✳ ]</span><strong id="gamesEmptyTitle">Загружаю библиотеку…</strong><p id="gamesEmptyDetail">Получаю игры и часы из Steam.</p><a href="https://steamcommunity.com/id/bleed4gucci/games/?tab=all" target="_blank" rel="noopener noreferrer">Открыть все игры в Steam ↗</a></div>
+<div class="games-pagination"><span id="gamesVisibleCount" aria-live="polite"></span><button class="small-button" id="gamesMore" type="button" hidden>Показать ещё</button></div>
+<div class="games-sync-line"><span id="gamesSyncStatus" role="status">Подключаюсь к Steam…</span><button id="gamesRefresh" type="button">↻ Обновить</button></div>
 </div>
 </section>
 <section class="panel gallery-panel" id="gallery">
@@ -112,6 +128,7 @@
 <p id="syncStatus">Подключение не настроено. Аватар и треки пока не синхронизируются.</p>
 <p class="sync-sub">Всё подключение выполняется владельцем на сервере. Для посетителей никакие ссылки на Telegram не показываются. Загруженная вручную аватарка имеет приоритет.</p>
 </div>
+<div class="sync-info"><strong>✳ Steam Sync</strong><p id="steamOwnerStatus">Проверяю подключение Steam…</p><p class="sync-sub">Профиль bleed4gucci. Игры и часы синхронизируются из Steam. Для отображения библиотеки игровой информации нужен открытый доступ.</p></div>
 <div class="editor-actions"><button class="subtle-button" id="exportBackup" type="button">↓ Скачать копию</button><label class="import-button">↑ Загрузить копию<input accept="application/json,.json" hidden="" id="importBackup" type="file"/></label><button class="save-button" type="submit">♡ SAVE CHANGES</button></div>
 </form>
 <div aria-live="polite" class="feedback" id="editFeedback" role="status"></div>
@@ -119,5 +136,6 @@
 </div>
 <div aria-live="polite" class="toast" id="toast" role="status"></div>
 <script src="app.js"></script>
+<script type="module" src="games.js?v=steam-1"></script>
 </body>
 </html>

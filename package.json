@@ -1,5 +1,6 @@
 {
   "name": "gucci-space",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": { "test": "node --test" }
 }
