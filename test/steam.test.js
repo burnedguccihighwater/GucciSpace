@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { loadSteamLibrary, normalizeLibrary, STEAM_ID } from '../lib/steam.js';
-import { selectGames, formatHours } from '../lib/games-view.js';
+import { loadSteamLibrary, loadSoftwareIds, normalizeLibrary, STEAM_ID } from '../lib/steam.js';
+import { loopPosition, formatHours } from '../lib/games-view.js';
 import handler from '../api/steam.js';
 
 const rawGame = (appid, extra = {}) => ({ appid, name: `Game ${appid}`, playtime_forever: appid * 10, ...extra });
@@ -12,6 +12,7 @@ test('retrieves every owned game, including played free games, without exposing 
   const library = await loadSteamLibrary('private-test-key', async (url, options) => {
     calls.push({ url, options });
     if (url.pathname.includes('GetOwnedGames')) return response({ response: { game_count: games.length, games } });
+    if (url.pathname.includes('GetAppList')) return response({ response: { apps: [] } });
     return response({ response: { players: [{ steamid: STEAM_ID, personaname: 'blonde supremacy' }] } });
   });
   assert.equal(library.games.length, 175);
@@ -28,7 +29,7 @@ test('hidden hours remain unknown and are not misrepresented as unplayed or a pa
   const library = normalizeLibrary({ game_count: 2, games: [rawGame(1), { appid: 2, name: 'Private time' }] });
   assert.equal(library.games[1].playtime_minutes, null);
   assert.equal(library.total_minutes, null);
-  assert.deepEqual(selectGames(library.games, { filter: 'unplayed' }), []);
+  assert.equal(formatHours(library.games[1].playtime_minutes), 'часы скрыты');
 });
 
 test('distinguishes an empty library from unavailable private game details', () => {
@@ -45,6 +46,7 @@ test('rejects incomplete library data rather than displaying it as the complete 
 test('game synchronization works if the optional profile-summary call fails', async () => {
   const library = await loadSteamLibrary('test', async url => {
     if (url.pathname.includes('GetPlayerSummaries')) throw Error('network');
+    if (url.pathname.includes('GetAppList')) return response({ response: { apps: [] } });
     return response({ response: { game_count: 1, games: [rawGame(730)] } });
   });
   assert.equal(library.game_count, 1);
@@ -62,16 +64,58 @@ test('classifies upstream key rejection and malformed data', async () => {
   await assert.rejects(loadSteamLibrary('test', async () => ({ ok: true, status: 200, json: async () => { throw Error('not JSON'); } })), { reason: 'steam_unavailable' });
 });
 
-test('searches and sorts the full library before pagination, without mutating it', () => {
-  const games = normalizeLibrary({ game_count: 3, games: [
-    rawGame(1, { name: 'Game 10', rtime_last_played: 100 }),
-    rawGame(2, { name: 'GAME 2', playtime_forever: 0, rtime_last_played: 300 }),
-    rawGame(3, { name: 'Игра', rtime_last_played: 200 })
-  ] }).games;
-  assert.deepEqual(selectGames(games, { query: '  game ', sort: 'name' }).map(g => g.appid), [2, 1]);
-  assert.deepEqual(selectGames(games, { sort: 'recent' }).map(g => g.appid), [2, 3, 1]);
-  assert.deepEqual(selectGames(games, { filter: 'unplayed' }).map(g => g.appid), [2]);
-  assert.deepEqual(games.map(g => g.appid), [1, 2, 3]);
+test('software is excluded from both the showcase and the total hours using Steam category ids', () => {
+  const library = normalizeLibrary({ game_count: 4, games: [
+    rawGame(730, { name: 'Counter-Strike 2', playtime_forever: 90 }),
+    rawGame(431960, { name: 'Wallpaper Engine', playtime_forever: 24000 }),
+    rawGame(365670, { name: 'Blender', playtime_forever: 400 }),
+    rawGame(42, { name: 'Blender: the game', playtime_forever: 10 })
+  ] }, new Set([431960, 365670]));
+  assert.deepEqual(library.games.map(g => g.appid), [730, 42]);
+  assert.equal(library.game_count, 2);
+  assert.equal(library.total_minutes, 100);
+  assert.equal(library.software_excluded, 2);
+});
+
+test('unknown hours in an excluded program do not hide the game-hours total', () => {
+  const library = normalizeLibrary({ game_count: 2, games: [
+    rawGame(730, { playtime_forever: 60 }), { appid: 431960, name: 'Software' }
+  ] }, new Set([431960]));
+  assert.equal(library.total_minutes, 60);
+});
+
+test('software catalogue requests the software category and follows every page, sharing the cache', async () => {
+  const cursors = [];
+  const fetcher = async url => {
+    const params = JSON.parse(url.searchParams.get('input_json'));
+    assert.equal(params.include_games, false);
+    assert.equal(params.include_software, true);
+    assert.equal(params.include_dlc, false);
+    cursors.push(params.last_appid);
+    return params.last_appid === 0
+      ? response({ response: { apps: [{ appid: 100 }], have_more_results: true, last_appid: 100 } })
+      : response({ response: { apps: [{ appid: 200 }] } });
+  };
+  const [first, concurrent] = await Promise.all([loadSoftwareIds('test', fetcher), loadSoftwareIds('test', fetcher)]);
+  assert.deepEqual([...first], [100, 200]); assert.equal(first, concurrent);
+  assert.equal(await loadSoftwareIds('test', fetcher), first);
+  assert.deepEqual(cursors, [0, 100]);
+});
+
+test('does not publish a mixed game/software library when classification is unavailable', async () => {
+  await assert.rejects(loadSteamLibrary('test', async url => {
+    if (url.pathname.includes('GetAppList')) return response({}, 503);
+    if (url.pathname.includes('GetOwnedGames')) return response({ response: { game_count: 1, games: [rawGame(431960)] } });
+    return response({ response: { players: [] } });
+  }), { reason: 'steam_unavailable' });
+});
+
+test('continuous reel wraps at the cycle boundary while preserving fractional progress', () => {
+  const width = 176 * 260;
+  assert.equal(loopPosition(width + 0.25, width), 0.25);
+  assert.equal(loopPosition(width * 4 + 137, width), 137);
+  assert.equal(loopPosition(-1, width), width - 1);
+  assert.equal(loopPosition(10, 0), 0);
 });
 
 test('formats small playtimes without rounding played games to zero hours', () => {

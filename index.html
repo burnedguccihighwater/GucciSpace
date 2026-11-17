@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#050505"/>
 <meta name="description" content="Gucci Space — музыка, фотографии, игры и мой уголок интернета."/>
 <title>Gucci's Space ☆</title>
-<link rel="stylesheet" href="style.css?v=steam-1"/>
+<link rel="stylesheet" href="style.css?v=showcase-1"/>
 </head>
 <body>
 <div class="global-sky" aria-hidden="true"></div>
@@ -80,14 +80,11 @@
 <div class="games-body" id="gamesPanelBody" aria-busy="true">
 <div class="steam-profile-line"><span>my Steam library</span><a href="https://steamcommunity.com/id/bleed4gucci/" target="_blank" rel="noopener noreferrer"><span id="steamProfileName">bleed4gucci</span> ↗</a></div>
 <div class="games-summary"><div><strong id="gamesTotal">—</strong><span>игр в библиотеке</span></div><div><strong id="gamesHours">—</strong><span>время в играх</span></div></div>
-<div class="games-controls" id="gamesControls">
-<div class="games-search-row"><label class="games-search-label">Найти игру<input id="gamesSearch" type="search" placeholder="Название игры…" maxlength="120" disabled/></label><label class="games-sort-label">Порядок<select id="gamesSort" disabled><option value="playtime">Больше всего играл</option><option value="recent">Недавно запускал</option><option value="name">По названию</option></select></label></div>
-<div class="games-filters" role="group" aria-label="Фильтр игр"><button type="button" data-games-filter="all" aria-pressed="true" disabled>Все игры</button><button type="button" data-games-filter="played" aria-pressed="false" disabled>Играл</button><button type="button" data-games-filter="unplayed" aria-pressed="false" disabled>Не запускал</button></div>
+<div class="games-showcase" id="gamesShowcase" hidden>
+<div class="games-reel" id="gamesReel" role="region" aria-label="Витрина всех игр Steam. Листай вбок; наведение или фокус останавливает автопрокрутку." tabindex="0"><div class="games-track" id="gamesTrack"></div></div>
 </div>
-<div class="games-grid" id="gamesGrid"></div>
 <div class="games-empty" id="gamesEmpty" role="status"><span aria-hidden="true">[ ✳ ]</span><strong id="gamesEmptyTitle">Загружаю библиотеку…</strong><p id="gamesEmptyDetail">Получаю игры и часы из Steam.</p><a href="https://steamcommunity.com/id/bleed4gucci/games/?tab=all" target="_blank" rel="noopener noreferrer">Открыть все игры в Steam ↗</a></div>
-<div class="games-pagination"><span id="gamesVisibleCount" aria-live="polite"></span><button class="small-button" id="gamesMore" type="button" hidden>Показать ещё</button></div>
-<div class="games-sync-line"><span id="gamesSyncStatus" role="status">Подключаюсь к Steam…</span><button id="gamesRefresh" type="button">↻ Обновить</button></div>
+<div class="games-sync-line"><span id="gamesSyncStatus" role="status">Подключаюсь к Steam…</span><span class="games-swipe-hint">листай вбок ↔</span></div>
 </div>
 </section>
 <section class="panel gallery-panel" id="gallery">
@@ -136,6 +133,6 @@
 </div>
 <div aria-live="polite" class="toast" id="toast" role="status"></div>
 <script src="app.js"></script>
-<script type="module" src="games.js?v=steam-1"></script>
+<script type="module" src="games.js?v=showcase-1"></script>
 </body>
 </html>
