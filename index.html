@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="#080b1f" name="theme-color"/>
+<meta content="Personal space · Y2K dreamcore" name="description"/>
+<title>Gucci's Space ☆</title>
+<link href="style.css" rel="stylesheet"/>
+</head>
+<body>
+<div aria-hidden="true" class="global-sky"></div>
+<div aria-hidden="true" class="noise"></div>
+<div class="site-wrap">
+<header class="site-header" id="top">
+<div class="topline"><span><i class="spark">✦</i> you've entered my universe</span><span class="right">★ best viewed with headphones ★</span></div>
+<div class="hero">
+<div class="hero-text">
+<div class="hero-eyebrow">WELCOME 2 MY PERSONAL SPACE <span class="blink">_</span></div>
+<h1><span id="heroTitle">GUCCI</span><em>’s space</em><span class="h-star">✧</span></h1>
+<p>somewhere between the stars &amp; the internet</p>
+</div>
+<div aria-hidden="true" class="hero-ornament"><span>✦</span><span>✧</span><span>✦</span></div>
+</div>
+<nav aria-label="Навигация по странице" class="nav">
+<a class="nav-link active" href="#profile">♡ PROFILE</a>
+<a class="nav-link" href="#about">✧ ABOUT</a>
+<a class="nav-link" href="#gallery">✿ GALLERY</a>
+<a class="nav-link" href="#music">♫ MUSIC</a>
+<button class="edit-nav" id="editOpen" type="button">✎ EDIT MY SPACE</button>
+</nav>
+</header>
+<main>
+<div class="marquee-bar"><span class="smallstar">✧</span><div class="marquee-viewport"><div class="marquee-track">WELCOME TO MY LITTLE CORNER OF THE INTERNET  ✦  STAY WEIRD, STAY DREAMY  ✦  WELCOME TO MY LITTLE CORNER OF THE INTERNET  ✦  STAY WEIRD, STAY DREAMY  ✦  </div></div><span class="smallstar">✧</span></div>
+<div class="layout">
+<aside class="left-column" id="profile">
+<section class="panel profile-panel">
+<div class="panel-title pink">★ WHO AM I?</div>
+<div class="profile-content">
+<h2 class="profile-name" id="displayName">gucci <span>♡</span></h2>
+<div class="avatar-wrap">
+<div aria-label="Фото профиля" class="avatar" id="avatarDisplay" role="img"><img src="assets/profile-avatar.jpg" alt="Фото профиля"/></div>
+<span class="avatar-sticker">✦ stardust ✦</span>
+</div>
+<div class="status">「<span id="displayStatus">lost in the stars...</span>」</div>
+<div class="profile-facts">
+<div><span>♡ mood</span><b id="displayMood">dreaming</b></div>
+<div><span>✦ location</span><b id="displayLocation">internet</b></div>
+<div><span>♫ listening</span><b id="displayMusic">my playlist</b></div>
+</div>
+</div>
+</section>
+<section class="panel currently-panel">
+<div class="panel-title pink">♫ ON MY PROFILE</div>
+<div class="mini-player"><div class="mini-player-overlay"><div class="rec">✦ PLAYLIST / RECENT</div><div class="player-title" id="featuredTrack">no tracks yet</div><div aria-hidden="true" class="tiny-eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small id="musicHint">Синхронизация треков появится после подключения</small></div></div>
+</section>
+<div aria-hidden="true" class="sticker-card"><span>★</span> keep dreaming <span>☾</span></div>
+</aside>
+<div class="right-column">
+<section class="panel about-panel" id="about">
+<div class="panel-title pink">♡ DEAR INTERNET, IT'S ME...</div>
+<div class="about-content">
+<div class="section-overline">✦ about me ✦</div>
+<p class="about-bio" id="displayBio">Это моё маленькое место в интернете. Здесь будет всё, что мне нравится: музыка, фотографии, мысли и немного космоса. ♡</p>
+<div class="about-separator">✧ ━━━ ✦ ━━━ ✧</div>
+<div class="interests-head">THE THINGS I LOVE <span>⌁</span></div>
+<div class="tag-list" id="interestTags"><span>music</span><span>design</span><span>night skies</span><span>2000s</span></div>
+</div>
+</section><section class="panel music-panel" id="music">
+<div class="panel-title blue"><span>♫ SOUNDS FROM MY UNIVERSE</span><span class="music-count" id="trackCount">0 tracks</span></div>
+<div class="music-body">
+<p class="music-intro">the soundtrack to my little corner of the internet ✧</p>
+<div aria-live="polite" class="track-list" id="tracksList"><div class="music-empty">✧ треки появятся здесь после подключения Telegram</div></div>
+<audio controls="" hidden="" id="trackAudio" preload="none"></audio>
+</div>
+</section>
+<section class="panel gallery-panel" id="gallery">
+<div class="panel-title blue"><span>✿ MY LITTLE GALLERY</span><button class="title-action" id="galleryAdd" type="button">+ ADD PHOTOS</button></div>
+<div class="gallery-inner">
+<p class="gallery-intro">a collection of things I want to remember ✧</p>
+<div aria-live="polite" class="gallery-grid" id="galleryGrid"></div>
+<div class="gallery-empty" id="galleryEmpty"><span>✦</span><strong>nothing here... yet!</strong><p>Добавь свои фотографии, рисунки или любую любимую картинку.</p><button class="small-button" id="galleryEmptyAdd" type="button">+ UPLOAD IMAGE</button></div>
+<input accept="image/*" hidden="" id="galleryInput" multiple="" type="file"/>
+</div>
+</section>
+<section class="panel vibe-panel">
+<div class="panel-title pink">✦ MOOD BOARD</div>
+<div class="mood-board"><div class="mood-image sky-sample"><span>the sky is ours</span></div><div class="mood-image wave-sample"><span>digital dreams</span></div><div class="mood-image eq-sample"><span>2000's forever</span></div></div>
+</section>
+<section class="panel note-panel">
+<div class="panel-title blue">✎ A LITTLE NOTE</div>
+<p>this page is always a work in progress. more memories, photos &amp; chaos coming soon...</p>
+<div class="note-sig">made with ♡ and a little stardust</div>
+</section>
+</div>
+</div>
+</main>
+<footer><span>© <span id="year"></span> <span id="footerName">GUCCI</span>'S SPACE</span><span>✧ THANKS FOR VISITING ✧</span><a href="#top">BACK TO TOP ↑</a></footer>
+</div>
+<div class="modal-backdrop" hidden="" id="editorBackdrop">
+<div aria-labelledby="editorHeading" aria-modal="true" class="editor" role="dialog">
+<div class="editor-header"><div><span class="editor-pretitle">★ CUSTOMIZE YOUR UNIVERSE</span><h2 id="editorHeading">Edit my space ✎</h2></div><button aria-label="Закрыть" class="close-btn" id="editClose" type="button">×</button></div>
+<p class="editor-hint">Ручные изменения и загруженные изображения сохраняются только в этом браузере. Для публикации их на сайте понадобится серверное хранилище; можно сохранить резервную копию.</p>
+<form id="editForm">
+<div class="form-grid">
+<label>Имя на странице<input id="editName" maxlength="40" name="name" placeholder="Gucci"/></label>
+<label>Статус<input id="editStatus" maxlength="100" name="status"/></label>
+<label>Настроение<input id="editMood" maxlength="40" name="mood"/></label>
+<label>Локация<input id="editLocation" maxlength="40" name="location"/></label>
+<label>Сейчас слушаю<input id="editMusic" maxlength="80" name="music"/></label>
+<label class="full">О себе<textarea id="editBio" maxlength="1800" name="bio" rows="4"></textarea></label><label class="telegram-bio-toggle"><input id="syncBioToggle" type="checkbox"/> Подставлять описание из Telegram (если доступно)</label>
+<label class="full">Интересы (через запятую)<input id="editInterests" maxlength="350" name="interests"/></label>
+</div>
+<div class="avatar-edit"><div class="avatar-edit-icon">♡</div><div><strong>Аватарка</strong><p>Выбери фото профиля с устройства</p><input accept="image/*" id="avatarInput" type="file"/></div><button class="subtle-button" id="removeAvatar" type="button">Удалить</button></div><div class="sync-info">
+<strong>✦ Telegram Sync</strong>
+<p id="syncStatus">Подключение не настроено. Аватар и треки пока не синхронизируются.</p>
+<p class="sync-sub">Всё подключение выполняется владельцем на сервере. Для посетителей никакие ссылки на Telegram не показываются. Загруженная вручную аватарка имеет приоритет.</p>
+</div>
+<div class="editor-actions"><button class="subtle-button" id="exportBackup" type="button">↓ Скачать копию</button><label class="import-button">↑ Загрузить копию<input accept="application/json,.json" hidden="" id="importBackup" type="file"/></label><button class="save-button" type="submit">♡ SAVE CHANGES</button></div>
+</form>
+<div aria-live="polite" class="feedback" id="editFeedback" role="status"></div>
+</div>
+</div>
+<div aria-live="polite" class="toast" id="toast" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>
