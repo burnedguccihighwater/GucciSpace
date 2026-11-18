@@ -129,6 +129,7 @@ button:disabled { cursor: default; }
 .gallery-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
 .gallery-grid:empty { display: none; }
 .gallery-item { position: relative; min-width: 0; aspect-ratio: 1 / 1.1; padding: 4px; border: 1px solid #4a5d3d; background: #0c1008; }
+.gallery-item > a { display: block; width: 100%; height: 100%; }
 .gallery-item img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .gallery-remove { position: absolute; top: 7px; right: 7px; display: grid; place-items: center; width: 25px; height: 25px; padding: 0; border: 1px solid #a8c68a; background: #050505d9; color: #fff; font-size: 18px; }
 .gallery-remove:hover { background: #375400; }
@@ -136,6 +137,14 @@ button:disabled { cursor: default; }
 .gallery-empty > span { display: block; color: var(--accent); font: 28px/1.2 Arial, sans-serif; margin-bottom: 10px; }
 .gallery-empty strong { display: block; color: #d9e9c9; font-size: 13px; }
 .gallery-empty p { margin: 7px 0 15px; font-size: 10px; }
+.gallery-login { color: #d2e4c0; font-size: 9px; font-weight: 400; white-space: nowrap; }
+.gallery-owner { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; color: #abc88f; font-size: 10px; }
+.gallery-owner button { padding: 4px 7px; border: 1px solid #455b33; background: #111a0b; color: #abc88f; font-size: 10px; }
+.gallery-drafts { margin-bottom: 12px; padding: 10px; border: 1px dashed #5e7d3f; background: #111a0b; }
+.gallery-drafts p { margin: 0 0 8px; color: #abc88f; font-size: 10px; line-height: 1.7; }
+.gallery-feedback { margin: 10px 0 0; color: #abc88f; font-size: 10px; line-height: 1.7; overflow-wrap: anywhere; }
+.gallery-feedback:empty { display: none; }
+.gallery-error { color: #f2b59d; }
 .small-button { min-height: 32px; padding: 6px 11px; border: 1px solid #779a37; background: var(--accent); color: #0d1500; font-size: 10px; font-weight: 700; }
 .small-button:hover { background: #d5ff75; }
 .mood-board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; padding: 9px; }

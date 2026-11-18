@@ -2,5 +2,10 @@
   "name": "gucci-space",
   "private": true,
   "type": "module",
-  "scripts": { "test": "node --test" }
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.9.0"
+  }
 }

@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#050505"/>
 <meta name="description" content="Gucci Space — музыка, фотографии, игры и мой уголок интернета."/>
 <title>Gucci's Space ☆</title>
-<link rel="stylesheet" href="style.css?v=showcase-1"/>
+<link rel="stylesheet" href="style.css?v=gallery-1"/>
 </head>
 <body>
 <div class="global-sky" aria-hidden="true"></div>
@@ -88,11 +88,14 @@
 </div>
 </section>
 <section class="panel gallery-panel" id="gallery">
-<div class="panel-title"><span>Gucci's photos</span><button class="title-action" id="galleryAdd" type="button">+ Add photos</button></div>
+<div class="panel-title"><span>Gucci's photos</span><a class="gallery-login" id="galleryLogin" href="/api/gallery-auth?action=login" hidden>Вход владельца</a><button class="title-action" id="galleryAdd" type="button" hidden>+ Добавить фото</button></div>
 <div class="gallery-inner">
 <p class="gallery-intro">a few things worth keeping.</p>
+<div class="gallery-owner" id="galleryOwner" hidden><span>♡ Твои фото видны всем</span><button id="galleryLogout" type="button">Выйти</button></div>
+<div class="gallery-drafts" id="galleryDrafts" hidden><p id="galleryDraftCount"></p><button class="small-button" id="galleryPublishDrafts" type="button">Опубликовать локальные фото</button></div>
 <div class="gallery-grid" id="galleryGrid" aria-live="polite"></div>
-<div class="gallery-empty" id="galleryEmpty"><span aria-hidden="true">[ ♡ ]</span><strong>Nothing here... yet.</strong><p>Фотографии, рисунки и всё, что хочется сохранить.</p><button class="small-button" id="galleryEmptyAdd" type="button">+ Upload image</button></div>
+<div class="gallery-empty" id="galleryEmpty"><span aria-hidden="true">[ ♡ ]</span><strong>Nothing here... yet.</strong><p>Здесь скоро будут фотографии.</p><button class="small-button" id="galleryEmptyAdd" type="button" hidden>+ Загрузить фото</button></div>
+<p class="gallery-feedback" id="galleryFeedback" role="status" aria-live="polite"></p>
 <input id="galleryInput" accept="image/*" type="file" multiple hidden/>
 </div>
 </section>
@@ -109,7 +112,7 @@
 <div class="modal-backdrop" hidden="" id="editorBackdrop">
 <div aria-labelledby="editorHeading" aria-modal="true" class="editor" role="dialog">
 <div class="editor-header"><div><span class="editor-pretitle">★ CUSTOMIZE YOUR UNIVERSE</span><h2 id="editorHeading">Edit my space ✎</h2></div><button aria-label="Закрыть" class="close-btn" id="editClose" type="button">×</button></div>
-<p class="editor-hint">Ручные изменения и загруженные изображения сохраняются только в этом браузере. Для публикации их на сайте понадобится серверное хранилище; можно сохранить резервную копию.</p>
+<p class="editor-hint">Текст профиля и ручная аватарка сохраняются в этом браузере. Фото в разделе Photos публикуются для всех после входа владельца через Steam. Резервная копия сохраняет локальные данные.</p>
 <form id="editForm">
 <div class="form-grid">
 <label>Имя на странице<input id="editName" maxlength="40" name="name" placeholder="Gucci"/></label>
@@ -132,7 +135,8 @@
 </div>
 </div>
 <div aria-live="polite" class="toast" id="toast" role="status"></div>
-<script src="app.js"></script>
+<script src="app.js?v=gallery-1"></script>
 <script type="module" src="games.js?v=showcase-1"></script>
+<script type="module" src="gallery.js?v=shared-1"></script>
 </body>
 </html>
