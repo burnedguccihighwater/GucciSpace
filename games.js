@@ -128,16 +128,6 @@ new IntersectionObserver(entries => { inView = entries[0].isIntersecting; update
 document.addEventListener('visibilitychange', updatePlayback);
 reducedMotion.addEventListener('change', updatePlayback);
 
-function setOwnerStatus(reason) {
-  const statuses = {
-    not_configured: 'Раздел готов. Для подключения добавь STEAM_API_KEY в настройки проекта на Vercel и выполни Redeploy.',
-    private_library: 'Steam скрывает список игр. В настройках приватности профиля открой «Доступ к игровой информации».',
-    invalid_key: 'Steam отклонил ключ. Проверь STEAM_API_KEY в настройках проекта на Vercel.',
-    steam_unavailable: 'Steam временно недоступен. Последняя загруженная витрина остаётся на странице.'
-  };
-  $('steamOwnerStatus').textContent = statuses[reason] || 'Подключено. Игры и часы обновляются автоматически. Программы исключаются по категории Steam.';
-}
-
 async function loadGames() {
   if (pending) return;
   pending = true; $('gamesPanelBody').setAttribute('aria-busy', 'true');
@@ -153,10 +143,9 @@ async function loadGames() {
     $('gamesHours').textContent = data.total_minutes === null ? '—' : formatHours(data.total_minutes);
     $('steamProfileName').textContent = data.profile?.name || 'bleed4gucci';
     $('gamesSyncStatus').textContent = 'Обновлено ' + new Date(data.synced_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-    setOwnerStatus(); renderShowcase();
+    renderShowcase();
   } catch (error) {
     const reason = messages[error.message] ? error.message : 'steam_unavailable';
-    setOwnerStatus(reason);
     if (library) $('gamesSyncStatus').textContent = 'Steam не ответил · витрина обновится позже';
     else {
       $('gamesCount').textContent = 'Steam';
