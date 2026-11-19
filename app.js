@@ -142,14 +142,21 @@
     const panel=$('music'),tab=$('musicTab');if(!panel||!tab)return;
     const siblings=Array.from(panel.parentElement.children).filter(el=>el!==panel);
     function route(hash){
-      const music=hash==='#music';
+      const music=hash==='#music',gallery=hash==='#gallery',exit=hash==='#exit-galaxy';
+      const standalone=gallery||exit;
+      document.body.classList.toggle('exit-mode',exit);
+      document.body.classList.toggle('gallery-mode',gallery);
+      document.querySelector('.layout').hidden=standalone;
+      document.querySelector('.marquee-bar').hidden=standalone;
+      $('gallery').hidden=!gallery;$('exitGalaxy').hidden=!exit;
       panel.hidden=!music;siblings.forEach(el=>{el.hidden=music;});
+      if(standalone)window.scrollTo(0,0);
       if(music)tab.setAttribute('aria-current','page');else tab.removeAttribute('aria-current');
       document.querySelectorAll('.nav-link').forEach(a=>a.classList.toggle('active',!music&&(a.getAttribute('href')===(hash==='#top'||!hash?'#profile':hash))));
     }
     document.addEventListener('click',e=>{
       const a=e.target.closest('a[href^="#"]');if(!a||e.defaultPrevented||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
-      const hash=a.getAttribute('href');if(hash==='#music'||!panel.hidden)route(hash);
+      const hash=a.getAttribute('href');if(['#music','#gallery','#exit-galaxy'].includes(hash)||!panel.hidden||document.body.classList.contains('exit-mode')||document.body.classList.contains('gallery-mode'))route(hash);
     });
     window.addEventListener('hashchange',()=>route(location.hash));
     $('sidebarPlay')?.addEventListener('click',startRadio);$('radioStart')?.addEventListener('click',startRadio);
