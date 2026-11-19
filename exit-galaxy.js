@@ -33,12 +33,13 @@ async function chooseTrack(){
  return false;
 }
 let trackReady=chooseTrack();
+const original=new Image();original.onload=()=>scene.querySelector('.exit-world').classList.add('has-original');original.src='assets/exit-galaxy-bg.webp';
 async function startSound(){
- try{buildAudio();if(ctx?.state==='suspended')await ctx.resume();if(!visible)return;if(ctx&&!raf)drift();if(await trackReady&&visible)await music.play();}catch{}
+ try{buildAudio();if(ctx?.state==='suspended')await ctx.resume();if(!visible)return;if(ctx&&!raf)drift();if(await trackReady&&visible&&music.paused)await music.play();}catch{}
 }
-function enter(){timers.forEach(clearTimeout);timers=[];scene.classList.remove('eyes-open','lit','tap-hint');setState('asleep');radioWasPlaying=!radio.paused;if(radioWasPlaying)radio.pause();
+function enter(){if(!music.getAttribute('src'))trackReady=chooseTrack();timers.forEach(clearTimeout);timers=[];scene.classList.remove('eyes-open','lit','tap-hint');setState('asleep');radioWasPlaying=!radio.paused;if(radioWasPlaying)radio.pause();
  later(()=>{scene.classList.add('eyes-open');setState('waking');later(()=>{setState('ready');startSound()},1450)},500);}
-function exit(){timers.forEach(clearTimeout);timers=[];scene.classList.remove('eyes-open','lit','tap-hint');setState('asleep');music.pause();music.currentTime=0;if(ctx?.state==='running')ctx.suspend().catch(()=>{});cancelAnimationFrame(raf);raf=0;if(radioWasPlaying)radio.play().catch(()=>{});radioWasPlaying=false;}
+function exit(){timers.forEach(clearTimeout);timers=[];scene.classList.remove('eyes-open','lit','tap-hint');setState('asleep');music.pause();try{music.currentTime=0}catch{};if(ctx?.state==='running')ctx.suspend().catch(()=>{});cancelAnimationFrame(raf);raf=0;if(radioWasPlaying)radio.play().catch(()=>{});radioWasPlaying=false;}
 $('exitPocket').addEventListener('click',()=>{if(state==='ready'){startSound();setState('pack')}});
 $('exitPack').addEventListener('click',()=>{if(state!=='pack')return;setState('open');later(()=>{if(state==='open'){scene.classList.add('tap-hint');if(navigator.vibrate&&!reduce.matches)navigator.vibrate(35)}},1000)});
 $('exitCig').addEventListener('click',()=>{if(state!=='open')return;scene.classList.remove('tap-hint');setState('held')});
