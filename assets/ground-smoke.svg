@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="300" viewBox="0 0 1440 300" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="black"/><stop offset=".16" stop-color="#080808"/><stop offset=".39" stop-color="#404040"/><stop offset=".68" stop-color="#b8b8b8"/><stop offset=".94" stop-color="white"/>
+    </linearGradient>
+    <filter id="soft" x="-25%" y="-60%" width="150%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="17 11"/></filter>
+    <mask id="bank" maskUnits="userSpaceOnUse" x="0" y="0" width="1440" height="300">
+      <path d="M-60 223 C36 209 57 171 115 192 S205 215 251 164 S345 113 405 168 S491 237 548 197 S631 114 711 157 S821 238 874 173 S963 134 1004 188 S1102 228 1159 174 S1288 141 1321 195 S1401 194 1500 160 L1500 340 L-60 340 Z" fill="white" filter="url(#soft)"/>
+    </mask>
+    <mask id="vertical"><rect width="1440" height="300" fill="url(#fade)"/></mask>
+    <filter id="smoke" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".009 .021" numOctaves="4" seed="39" result="cloud"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".0035 .009" numOctaves="3" seed="72" result="warp"/>
+      <feDisplacementMap in="cloud" in2="warp" scale="85" xChannelSelector="R" yChannelSelector="G" result="warped"/>
+      <feColorMatrix in="warped" type="matrix" values="0 0 0 0 .78  0 0 0 0 .84  0 0 0 0 .89  3.8 0 0 0 -1.36" result="density"/>
+      <feGaussianBlur in="density" stdDeviation=".7"/>
+    </filter>
+    <filter id="wisps" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".016 .038" numOctaves="3" seed="16" result="detail"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".005 .012" numOctaves="2" seed="53" result="bend"/>
+      <feDisplacementMap in="detail" in2="bend" scale="52" xChannelSelector="G" yChannelSelector="R"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 .83  0 0 0 0 .88  0 0 0 0 .92  4.9 0 0 0 -2.15"/>
+      <feGaussianBlur stdDeviation=".4"/>
+    </filter>
+  </defs>
+  <g mask="url(#vertical)"><g mask="url(#bank)">
+    <rect width="1440" height="300" filter="url(#smoke)" opacity=".76"/>
+    <rect width="1440" height="300" filter="url(#wisps)" opacity=".32"/>
+  </g></g>
+</svg>
