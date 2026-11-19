@@ -19,12 +19,17 @@ function buildAudio(){
  const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
  ctx=new C();master=ctx.createGain();master.gain.value=.9;master.connect(ctx.destination);
  night=ctx.createBufferSource();night.buffer=noiseBuffer(7);night.loop=true;const air=ctx.createBiquadFilter();air.type='lowpass';air.frequency.value=750;const gain=ctx.createGain();gain.gain.value=.14;night.connect(air).connect(gain).connect(master);night.start();
- musicSource=ctx.createMediaElementSource(music);filter=ctx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=4200;filter.Q.value=.45;const distance=ctx.createGain();distance.gain.value=.65;pan=ctx.createStereoPanner?ctx.createStereoPanner():ctx.createGain();if(pan.pan)pan.pan.value=-.18;
+ musicSource=ctx.createMediaElementSource(music);filter=ctx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=2100;filter.Q.value=.55;const distance=ctx.createGain();distance.gain.value=.24;pan=ctx.createStereoPanner?ctx.createStereoPanner():ctx.createGain();if(pan.pan)pan.pan.value=-.22;
  musicSource.connect(filter).connect(distance).connect(pan).connect(master);
- const verb=ctx.createConvolver();verb.buffer=noiseBuffer(1.7,true);wet=ctx.createGain();wet.gain.value=.22;filter.connect(verb).connect(wet).connect(master);
+ // Reflections from nearby concrete walls: independent early echoes and diffuse tail.
+ const early=ctx.createDelay(.5);early.delayTime.value=.065;const earlyGain=ctx.createGain();earlyGain.gain.value=.085;const earlyPan=ctx.createStereoPanner?ctx.createStereoPanner():ctx.createGain();if(earlyPan.pan)earlyPan.pan.value=.28;
+ filter.connect(early).connect(earlyGain).connect(earlyPan).connect(master);
+ const pre=ctx.createDelay(.5);pre.delayTime.value=.042;const verb=ctx.createConvolver();verb.buffer=noiseBuffer(2.15,true);
+ const reflected=ctx.createBiquadFilter();reflected.type='lowpass';reflected.frequency.value=1500;wet=ctx.createGain();wet.gain.value=.20;
+ filter.connect(pre).connect(verb).connect(reflected).connect(wet).connect(master);
 }
 function drift(){
- if(!visible||!ctx)return;const t=ctx.currentTime;filter.frequency.setTargetAtTime(4200+480*Math.sin(t*.23),t,.45);if(pan.pan)pan.pan.setTargetAtTime(-.18+.055*Math.sin(t*.29),t,.45);raf=requestAnimationFrame(drift);
+ if(!visible||!ctx)return;const t=ctx.currentTime;filter.frequency.setTargetAtTime(2100+110*Math.sin(t*.23),t,.45);if(pan.pan)pan.pan.setTargetAtTime(-.22+.025*Math.sin(t*.29),t,.45);raf=requestAnimationFrame(drift);
 }
 const soundButton=$('exitSound');
 let ready=false;
