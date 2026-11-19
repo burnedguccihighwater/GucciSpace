@@ -582,3 +582,48 @@ footer { position: relative; z-index: 2; }
 .memory-panel textarea { display:block; resize:vertical; width:100%; border:1px solid #25465d; background:#041424; color:#e1eaf4; padding:8px; font-size:14px; }
 #memoryLogin { min-height:32px; overflow:hidden; }
 @media(max-width:640px){ .social-body{padding:6px;} .diary-post iframe{height:320px;} .social-status,.social-source{font-size:8px;} .memory-panel textarea{font-size:16px;} .radio-console-bottom{flex-wrap:wrap;padding:4px;} .nav-link{padding:5px 4px;} }
+
+/* T Deary: native compact cards, with a small cyberpunk companion image. */
+.diary-panel,.diary-layout,.diary-feed,.diary-posts,.diary-post { min-width:0; max-width:100%; }
+.diary-panel { overflow:hidden; }
+.diary-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,150px); gap:10px; align-items:start; }
+.diary-art { grid-column:2; grid-row:1; min-width:0; overflow:hidden; border:1px solid #25465d; background:#030d17; }
+.diary-art-image { position:relative; overflow:hidden; }
+.diary-art-image img { display:block; width:100%; height:auto; filter:saturate(.86) contrast(1.04); }
+.diary-art-image::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(0deg,#030d17a6,transparent 45%),linear-gradient(110deg,#0860ae1f,transparent 65%); }
+.diary-art-note { padding:8px; overflow-wrap:anywhere; color:#b9e4ff; }
+.diary-art-note span { display:block; font-size:8px; color:#66caff; letter-spacing:1px; }
+.diary-art-note strong { display:block; margin:4px 0; line-height:1.4; font-weight:400; font-size:12px; }
+.diary-art-note small { font-size:8px; color:#8da6bc; }
+.diary-feed { grid-column:1; grid-row:1; }
+.diary-posts { gap:6px; max-height:420px; overflow-y:auto; overflow-x:hidden; overscroll-behavior-y:contain; scrollbar-width:thin; scrollbar-color:#25465d transparent; }
+.diary-post { display:block; padding:7px; overflow:hidden; border-color:#17344b; background:#071725; flex:0 0 auto; }
+.diary-post-head,.diary-post-foot { display:flex; align-items:center; justify-content:space-between; gap:5px; color:#8da6bc; font-size:9px; overflow-wrap:anywhere; }
+.diary-post-head { color:#b9e4ff; margin-bottom:5px; }
+.diary-post-link { padding:0; font-size:9px; flex-shrink:0; }
+.diary-post-text { margin:6px 0; white-space:pre-wrap; overflow-wrap:anywhere; font-size:11px; line-height:1.45; color:#d5e3f2; display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
+.diary-media { position:relative; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:3px; overflow:hidden; }
+.diary-media[data-count="1"] { grid-template-columns:minmax(0,1fr); }
+.diary-media[data-count="2"] { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.diary-media img { width:100%; display:block; height:92px; object-fit:cover; min-width:0; background:#041424; }
+.diary-media[data-count="1"] img { height:auto; max-height:140px; object-fit:contain; }
+.diary-video-label { position:absolute; top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;background:#020812bf;color:#e1eaf4;padding:8px 11px; }
+.diary-post-foot { margin-top:6px; }
+.diary-post-foot a { text-align:right; }
+.diary-feed #diaryMore { margin-top:5px; }
+@media(max-width:800px){ .diary-layout { grid-template-columns:minmax(0,1fr) minmax(0,112px); gap:6px; } }
+@media(max-width:640px){
+ .diary-layout { grid-template-columns:minmax(0,1fr); gap:5px; }
+ .diary-art { grid-column:1; grid-row:1; display:grid; grid-template-columns:minmax(0,42%) minmax(0,1fr); align-items:center; }
+ .diary-art-image img { aspect-ratio:1.25; object-fit:cover; }
+ .diary-art-note { padding:5px; }
+ .diary-art-note strong { font-size:10px; }
+ .diary-art-note span,.diary-art-note small { font-size:7px; }
+ .diary-feed { grid-column:1;grid-row:2; }
+ .diary-posts { max-height:310px; gap:4px; }
+ .diary-post { padding:5px; }
+ .diary-post-text { font-size:10px; -webkit-line-clamp:4; }
+ .diary-post-head,.diary-post-foot,.diary-post-link { font-size:8px; }
+ .diary-media img { height:58px; }
+ .diary-media[data-count="1"] img { max-height:100px; }
+}
