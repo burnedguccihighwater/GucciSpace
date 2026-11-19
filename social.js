@@ -9,9 +9,24 @@ async function diary(){
   for(const p of d.posts){
    if(!Number.isSafeInteger(p.id)||seen.has(p.id))continue;
    seen.add(p.id);count++;
-   const card=document.createElement('div');card.className='diary-post';
-   const link=document.createElement('a');link.className='diary-post-link';link.href='https://t.me/guccihighlights/'+p.id;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Бухта Кэндл · #'+p.id+' ↗';
-   const frame=document.createElement('iframe');frame.src=link.href+'?embed=1&dark=1';frame.loading='lazy';frame.title='Пост Бухта Кэндл №'+p.id;frame.referrerPolicy='no-referrer';frame.setAttribute('scrolling','yes');card.append(link,frame);$('diaryPosts').append(card);
+   const card=document.createElement('article');card.className='diary-post';
+   const url='https://t.me/guccihighlights/'+p.id;
+   const head=document.createElement('div');head.className='diary-post-head';
+   const channel=document.createElement('span');channel.textContent='Бухта Кэндл';
+   const link=document.createElement('a');link.className='diary-post-link';link.href=url;link.target='_blank';link.rel='noopener noreferrer';link.textContent='#'+p.id+' ↗';
+   head.append(channel,link);card.append(head);
+   const urls=(Array.isArray(p.photos)?p.photos:[]).filter(u=>typeof u==='string'&&/^https:\/\/(?:[a-z0-9-]+\.)*(?:telesco\.pe|telegram-cdn\.org|telegram\.org|t\.me)\//i.test(u)).slice(0,3);
+   if(urls.length){
+    const media=document.createElement('a');media.className='diary-media';media.href=url;media.target='_blank';media.rel='noopener noreferrer';media.dataset.count=String(urls.length);
+    for(const src of urls){const img=document.createElement('img');img.src=src;img.alt='Фото из публикации';img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';img.addEventListener('error',()=>{img.remove();if(!media.querySelector('img'))media.remove();});media.append(img);}
+    if(p.video){const play=document.createElement('span');play.className='diary-video-label';play.textContent='▶';media.append(play);}
+    card.append(media);
+   }
+   if(typeof p.text==='string'&&p.text.trim()){const body=document.createElement('p');body.className='diary-post-text';body.textContent=p.text;card.append(body);}
+   const foot=document.createElement('div');foot.className='diary-post-foot';
+   const date=new Date(p.date||'');const time=document.createElement('time');if(!Number.isNaN(date.getTime())){time.dateTime=date.toISOString();time.textContent=date.toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'});}
+   const open=document.createElement('a');open.href=url;open.target='_blank';open.rel='noopener noreferrer';open.textContent=p.video?'Смотреть ↗':'Открыть пост ↗';foot.append(time,open);card.append(foot);
+   $('diaryPosts').append(card);
   }
   $('diaryStatus').textContent=count?'':'Больше публикаций не найдено.';
   const next=Number(d.before);$('diaryMore').hidden=!count||!next||next===before;before=next;
