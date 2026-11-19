@@ -527,14 +527,14 @@ body { position: relative; min-height: 100vh; }
   transform-origin: center bottom;
 }
 .bottom-mist i:nth-child(1) {
-  opacity: .66; animation: gucci-smoke-bank 28s ease-in-out infinite alternate;
+  opacity: .34; animation: gucci-smoke-bank 28s ease-in-out infinite alternate;
 }
 .bottom-mist i:nth-child(2) {
-  height: 82%; opacity: .53; width: 152%; left: -26%;
+  height: 82%; opacity: .27; width: 152%; left: -26%;
   animation: gucci-smoke-counterflow 39s ease-in-out -16s infinite alternate;
 }
 .bottom-mist i:nth-child(3) {
-  height: 59%; opacity: .46; width: 150%; left: -25%;
+  height: 59%; opacity: .23; width: 150%; left: -25%;
   animation: gucci-smoke-bank 34s ease-in-out -21s infinite alternate;
 }
 @keyframes gucci-smoke-bank {
