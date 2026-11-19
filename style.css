@@ -566,3 +566,19 @@ footer { position: relative; z-index: 2; }
 /* Public profile: three equally spaced navigation links, no editing controls. */
 .nav { flex-wrap: nowrap; }
 .nav-link { flex: 1 1 0; }
+
+/* Radio / diary / private memories, in the existing Steam-blue palette. */
+.radio-console { margin: 0 0 12px; border: 1px solid #25465d; background: #020a14; }
+.radio-console canvas { display: block; width: 100%; height: auto; min-height: 35px; background: repeating-linear-gradient(0deg,transparent 0 17px,#10283a 18px),repeating-linear-gradient(90deg,transparent 0 22px,#10283a 23px); }
+.radio-console-bottom { display:flex; align-items:center; justify-content:space-between; gap:5px; padding:5px 8px; color:#8da6bc; font-size:9px; }
+.radio-console-bottom button:disabled,.memory-panel button:disabled { opacity:.42; }
+.social-source { font-size:9px; color:#b9e4ff; font-weight:400; }
+.social-body { padding:12px; }
+.diary-posts { display:flex; flex-direction:column; gap:10px; }
+.diary-post { border:1px solid #17344b; background:#041424; min-width:0; }
+.diary-post-link { display:block; padding:5px 7px; font-size:10px; }
+.diary-post iframe { border:0; width:100%; height:360px; display:block; background:#071a2b; }
+.social-status { margin:6px 0; color:#8da6bc; font-size:10px; overflow-wrap:anywhere; }
+.memory-panel textarea { display:block; resize:vertical; width:100%; border:1px solid #25465d; background:#041424; color:#e1eaf4; padding:8px; font-size:14px; }
+#memoryLogin { min-height:32px; overflow:hidden; }
+@media(max-width:640px){ .social-body{padding:6px;} .diary-post iframe{height:320px;} .social-status,.social-source{font-size:8px;} .memory-panel textarea{font-size:16px;} .radio-console-bottom{flex-wrap:wrap;padding:4px;} .nav-link{padding:5px 4px;} }
