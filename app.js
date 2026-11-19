@@ -59,7 +59,8 @@
   let currentTrack=null,playlist=[];
   const timeLabel=s=>Number.isFinite(s)&&s>=0?Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0'):'0:00';
   function syncPlayer(){
-    const a=$('trackAudio'),active=!!currentTrack,playing=active&&!a.paused;
+    const a=$('trackAudio'),active=!!currentTrack,playing=active&&!a.paused&&!a.ended;
+    document.querySelector('.music-sidebar')?.classList.toggle('is-playing',playing);
     $('musicPlayer').hidden=!active;
     const mini=$('sidebarPlay');if(mini){mini.disabled=!active&&!playlist.some(t=>validAudio(t.src));mini.textContent=playing?'Ⅱ':'▶';mini.setAttribute('aria-label',playing?'Пауза':'Воспроизвести');}
     $('playerToggle').textContent=playing?'Ⅱ':'▶';$('playerToggle').setAttribute('aria-label',playing?'Пауза':'Воспроизвести');
