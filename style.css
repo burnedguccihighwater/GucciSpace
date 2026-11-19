@@ -286,6 +286,60 @@ footer a { color: #b5d295; }
   .avatar-edit .subtle-button { margin-left: 0; }
   .save-button { width: 100%; margin-left: 0; min-height: 42px; }
 }
+/* Compact mobile profile: keep the original desktop aesthetic and visible acid gutters. */
+@media (max-width: 640px) {
+  html { background: var(--bg); -webkit-text-size-adjust: 100%; }
+  body { min-width: 0; background: transparent; isolation: isolate; }
+  .site-wrap { width: calc(100% - 2 * clamp(14px, 4.7vw, 24px)); padding: 0 9px 20px; margin-top: 10px; }
+  .topline { padding: 7px 0 6px; gap: 8px; }
+  .hero { min-height: 68px; padding: 11px 0; gap: 9px; }
+  .wordmark { gap: 8px; }
+  .hero h1 { font-size: 25px; letter-spacing: -1.1px; }
+  .brand-symbol { font-size: 34px; }
+  .brand-heart { font-size: 13px; }
+  .hero p { margin-top: 3px; font-size: 9px; }
+  .nav-link { min-height: 36px; padding: 5px 4px; font-size: 10px; white-space: nowrap; }
+  .edit-nav { min-height: 30px; padding: 5px 7px; font-size: 9px; }
+  .marquee-bar { padding: 7px 0 11px; }
+  .layout { gap: 12px; }
+  .panel-title { min-height: 26px; padding: 4px 8px; gap: 6px; }
+  .profile-content { grid-template-columns: minmax(0, 39%) minmax(0, 1fr); column-gap: 11px; }
+  .profile-name { margin: 0 0 8px; font-size: 20px; }
+  .profile-name span { font-size: 16px; }
+  .status { margin-bottom: 6px; }
+  .profile-facts { padding-bottom: 4px; }
+  .profile-facts > div { margin-bottom: 5px; }
+  .profile-shortcuts { padding-top: 6px; gap: 6px; }
+  .network-banner { min-height: 65px; padding: 10px 22px; font-size: 15px; }
+  .network-banner > span { font-size: 21px; top: 5px; right: 8px; }
+  .about-content, .music-body, .gallery-inner, .games-body { padding: 8px; }
+  .about-bio { line-height: 1.65; }
+  .about-signature { margin-top: 9px; }
+  .music-intro, .gallery-intro { margin-bottom: 8px; }
+  .track-row { min-height: 50px; gap: 7px; padding: 6px 2px; }
+  .track-cover { width: 36px; height: 36px; flex-basis: 36px; font-size: 17px; }
+  .track-play { width: 36px; height: 36px; flex-basis: 36px; }
+  .music-player { gap: 8px; margin-top: 9px; padding: 9px; }
+  .games-summary { margin: 9px 0; }
+  .games-summary > div { padding: 7px 8px; }
+  .games-summary strong { font-size: 18px; }
+  .game-tile { flex-basis: clamp(132px, 42vw, 192px); width: clamp(132px, 42vw, 192px); }
+  .games-group { gap: 7px; padding-right: 7px; }
+  .game-name { padding: 6px; }
+  .games-sync-line { margin-top: 9px; padding-top: 7px; }
+  .games-sync-line > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+  .gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .gallery-item { padding: 3px; }
+  .gallery-remove { top: 4px; right: 4px; }
+  .mood-board { gap: 5px; padding: 6px; }
+  .mood-image { min-height: 80px; }
+  .mini-player-overlay { padding: 9px; }
+  footer { margin-top: 18px; padding-top: 10px; }
+}
+@media (min-width: 390px) and (max-width: 640px) {
+  .nav { flex-wrap: nowrap; }
+  .edit-nav { flex: 0 0 auto; margin-left: auto; min-height: 36px; border-top: 0; border-left: 1px solid #536647; white-space: nowrap; }
+}
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: .001ms !important; animation-duration: .001ms !important; }
