@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#050505"/>
 <meta name="description" content="Gucci Space — музыка, фотографии, игры и мой уголок интернета."/>
 <title>Gucci's Space ☆</title>
-<link rel="stylesheet" href="style.css?v=game-boxes-1"/>
+<link rel="stylesheet" href="style.css?v=life-showcase-1"/>
 </head>
 <body>
 <div class="global-sky" aria-hidden="true"></div>
@@ -69,6 +69,15 @@
 <div class="player-controls"><button id="playerPrev" type="button" aria-label="Предыдущий трек">|◀</button><button id="playerToggle" type="button" aria-label="Воспроизвести">▶</button><button id="playerNext" type="button" aria-label="Следующий трек">▶|</button></div>
 <div class="player-timeline"><span id="playerElapsed">0:00</span><input id="playerSeek" type="range" min="0" max="1000" value="0" aria-label="Позиция воспроизведения"/><span id="playerTotal">0:00</span></div>
 </div><audio id="trackAudio" preload="none" hidden></audio>
+</div>
+</section>
+<section class="life-showcase" id="life" aria-labelledby="lifeHeading">
+<h2 class="life-heading" id="lifeHeading" aria-label="Life is Beautiful">𝔏𝔦𝔣𝔢 𝔦𝔰 𝔅𝔢𝔞𝔲𝔱𝔦𝔣𝔲𝔩</h2>
+<div class="life-text-shell"><div class="life-text"><span>🦋 I know that it hurts sometimes, but it's beautiful</span><br/><span class="life-indent">Working every day, now you're bleeding through your cuticles</span><br/><span class="life-indent">Passing through a portal as you're sittin' in your cubicle</span><br/><span class="life-indent">Isn't life beautiful? I think that life is beautiful</span><br/><span class="life-indent">Tryin' to keep your cool at your grandfather's funeral</span><br/><span class="life-indent">Finding out eventually the feeling wasn't mutual</span><br/><span class="life-indent">You were not invited 'cause you're nothing like the usual</span><br/><span class="life-indent">Isn't life beautiful? I think that life is beautiful</span></div></div>
+<div class="life-art-shell">
+<div class="life-art-grid" id="lifeArtwork" hidden><div class="life-art-main"></div><div class="life-art-side"></div></div>
+<div class="life-art-status" id="lifeArtworkStatus" role="status">Загружаю оригинальные иллюстрации Steam…</div>
+<div class="life-art-caption" id="lifeArtworkTitle"></div>
 </div>
 </section>
 <section class="panel games-panel" id="games" aria-labelledby="gamesHeading">
@@ -134,5 +143,6 @@
 <script src="app.js?v=music-sidebar-1"></script>
 <script type="module" src="games.js?v=game-boxes-1"></script>
 <script type="module" src="gallery.js?v=shared-1"></script>
+<script type="module" src="life-showcase.js?v=1"></script>
 </body>
 </html>
