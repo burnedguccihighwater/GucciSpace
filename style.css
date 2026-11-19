@@ -490,3 +490,72 @@ footer a { color: #c5d7e8; }
   .network-banner::before, .music-sidebar.is-playing .sidebar-eq i { animation: none !important; }
   .music-sidebar.is-playing .sidebar-eq i { transform: scaleY(.65); }
 }
+
+/* Starlight and ground mist — stars are confined to the visible outer gutters. */
+body { position: relative; min-height: 100vh; }
+.side-stars { position: absolute; top: 0; bottom: 0; width: max(28px, calc((100% - 960px) / 2)); pointer-events: none; overflow: hidden; }
+.side-stars-left { left: 0; }
+.side-stars-right { right: 0; }
+.side-stars i {
+  position: absolute; left: var(--x); top: var(--y);
+  width: var(--s); height: var(--s); border-radius: 50%;
+  background: #e7f5ff; box-shadow: 0 0 5px #8fd5ff9c;
+  opacity: .68; transform: translate(-50%,-50%);
+  animation: gucci-side-twinkle var(--t) ease-in-out var(--d) infinite;
+}
+.side-stars i.star-cross { background: #f5faff; }
+.side-stars i.star-cross::before, .side-stars i.star-cross::after {
+  content: ""; position: absolute; left: 50%; top: 50%; border-radius: 100%;
+  background: #d5efffc9; transform: translate(-50%,-50%);
+}
+.side-stars i.star-cross::before { width: 1px; height: 8px; }
+.side-stars i.star-cross::after { width: 8px; height: 1px; }
+@keyframes gucci-side-twinkle {
+  0%, 100% { opacity: .18; transform: translate(-50%,-50%) scale(.74); }
+  46% { opacity: .94; transform: translate(-50%,-50%) scale(1.13); }
+  72% { opacity: .43; transform: translate(-50%,-50%) scale(.92); }
+}
+/* Anchored to the document footer, not the viewport; mist is decorative only. */
+.bottom-mist { position: absolute; bottom: 0; left: 0; width: 100%; height: clamp(90px, 14vw, 185px); overflow: hidden; pointer-events: none; z-index: 1; }
+.bottom-mist::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to top,#8fcbef20,transparent 75%); }
+.bottom-mist i { position: absolute; inset: auto -15% -22% -15%; height: 92%; pointer-events: none; filter: blur(9px); }
+.bottom-mist i:nth-child(1) {
+  background: radial-gradient(ellipse at 8% 75%,#b7e0fa55,transparent 24%),
+              radial-gradient(ellipse at 35% 92%,#88c8ef66,transparent 31%),
+              radial-gradient(ellipse at 67% 78%,#c6e6ff47,transparent 27%),
+              radial-gradient(ellipse at 92% 85%,#8cc8ed55,transparent 28%);
+  animation: gucci-mist-drift 22s ease-in-out infinite alternate;
+}
+.bottom-mist i:nth-child(2) {
+  bottom: -9%; height: 77%; opacity: .62;
+  background: radial-gradient(ellipse at 21% 93%,#b7dfff55,transparent 27%),
+              radial-gradient(ellipse at 53% 92%,#88bee65c,transparent 33%),
+              radial-gradient(ellipse at 81% 100%,#c0e4fa55,transparent 28%);
+  animation: gucci-mist-drift 31s ease-in-out -13s infinite alternate-reverse;
+}
+.bottom-mist i:nth-child(3) {
+  bottom: -4%; height: 48%; opacity: .55;
+  background: radial-gradient(ellipse at 15% 100%,#c0e4fa6b,transparent 35%),
+              radial-gradient(ellipse at 59% 94%,#aecde65c,transparent 40%),
+              radial-gradient(ellipse at 95% 100%,#a4d7f967,transparent 32%);
+  animation: gucci-mist-drift 27s ease-in-out -6s infinite alternate;
+}
+@keyframes gucci-mist-drift {
+  from { transform: translate3d(-4%, 1%, 0) scaleY(.87); }
+  to { transform: translate3d(4%, -9%, 0) scaleY(1.08); }
+}
+footer { position: relative; z-index: 2; }
+@media (max-width:800px) {
+  .side-stars { width: 14px; }
+}
+@media (max-width:640px) {
+  .side-stars { width: clamp(10px,3vw,18px); }
+  .side-stars i.star-cross::before { height: 5px; }
+  .side-stars i.star-cross::after { width: 5px; }
+  .side-stars i:nth-child(3n) { display: none; }
+  .bottom-mist { height: 100px; }
+  .bottom-mist i { filter: blur(6px); }
+}
+@media (prefers-reduced-motion:reduce) {
+  .side-stars i, .bottom-mist i { animation: none !important; }
+}
