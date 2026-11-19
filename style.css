@@ -419,3 +419,74 @@ footer a { color: #c5d7e8; }
  .life-art-side { gap:4px; }
  .life-art-caption,.life-art-status { font-size:8px; }
 }
+
+/* Midnight motion — gentle, low-contrast ambient light, no rapid flashing. */
+.global-sky { overflow: hidden; }
+.global-sky::before {
+  content: ""; position: absolute; inset: -12%; pointer-events: none;
+  background: radial-gradient(ellipse at 16% 74%, #086fc19c 0%, transparent 48%),
+              radial-gradient(ellipse at 82% 28%, #17498d8c 0%, transparent 46%),
+              radial-gradient(ellipse at 85% 96%, #28a9e68c 0%, transparent 38%);
+  opacity: .75;
+  animation: gucci-ambient-drift 24s ease-in-out infinite alternate;
+}
+@keyframes gucci-ambient-drift {
+  0% { transform: translate3d(-5%, 2%, 0); opacity: .48; }
+  50% { transform: translate3d(2%, -3%, 0); opacity: .78; }
+  100% { transform: translate3d(5%, 3%, 0); opacity: .95; }
+}
+.site-wrap { background: linear-gradient(180deg,#071a2ceF 0,#041424f5 370px,#041424fa 100%); }
+.brand-symbol, .brand-heart, .marquee-bar > span, .network-banner > span {
+  animation: gucci-starlight 5.8s ease-in-out infinite;
+}
+.brand-heart, .marquee-bar > span:last-child { animation-delay: -2.6s; }
+.network-banner > span { animation-delay: -1.8s; }
+@keyframes gucci-starlight {
+  0%, 100% { opacity: .78; text-shadow: 0 0 4px #66caff35; }
+  50% { opacity: 1; text-shadow: 0 0 12px #66caffaa, 0 0 23px #269fff55; }
+}
+.nav, .life-heading, .music-tab:not([aria-current="page"]) {
+  background: linear-gradient(105deg,#0065b4 0%,#0080ce 25%,#005ba4 48%,#02437b 74%,#0065b4 100%);
+  background-size: 220% 100%;
+  animation: gucci-blue-flow 15s ease-in-out infinite alternate;
+}
+.life-heading { animation-delay: -5s; }
+.music-tab:not([aria-current="page"]) { animation-delay: -9s; }
+@keyframes gucci-blue-flow {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+.network-banner { position: relative; overflow: hidden; isolation: isolate; }
+.network-banner::before {
+  content: ""; position: absolute; z-index: -1; inset: 0;
+  background: radial-gradient(ellipse at 35% 90%, #197dbe38, transparent 70%);
+  animation: gucci-breathe 8s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes gucci-breathe { from { opacity: .25; } to { opacity: .95; } }
+.sidebar-track .rec { display: flex; align-items: center; gap: 4px; }
+.sidebar-eq { display: inline-flex; align-items: center; gap: 2px; height: 9px; flex-shrink: 0; }
+.sidebar-eq i { display: block; width: 2px; height: 8px; background: var(--accent); transform: scaleY(.25); opacity: .45; transform-origin: center; }
+.music-sidebar.is-playing .sidebar-eq i { animation: gucci-eq .85s ease-in-out infinite alternate; opacity: .9; }
+.music-sidebar.is-playing .sidebar-eq i:nth-child(2) { animation-delay: -.49s; }
+.music-sidebar.is-playing .sidebar-eq i:nth-child(3) { animation-delay: -.25s; }
+.music-sidebar.is-playing .sidebar-eq i:nth-child(4) { animation-delay: -.64s; }
+@keyframes gucci-eq { from { transform: scaleY(.25); } to { transform: scaleY(1); } }
+.music-sidebar.is-playing .sidebar-play { box-shadow: 0 0 9px #66caff55; }
+.game-card, .track-play, .sidebar-play, .title-action { transition: border-color .2s, box-shadow .25s, background-color .2s; }
+@media (hover:hover) {
+  .game-card:hover { box-shadow: inset 0 0 0 1px #66caff44, 0 0 9px #007ccb55; }
+  .track-play:not(:disabled):hover, .sidebar-play:not(:disabled):hover { box-shadow: 0 0 10px #66caff60; }
+}
+@media (max-width:640px) {
+  .global-sky::before { animation-duration: 30s; }
+  .sidebar-track .rec { gap: 3px; flex-wrap: wrap; }
+  .sidebar-eq { gap: 1px; height: 7px; }
+  .sidebar-eq i { height: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .global-sky::before, .brand-symbol, .brand-heart, .marquee-bar > span,
+  .network-banner > span, .nav, .life-heading, .music-tab:not([aria-current="page"]),
+  .network-banner::before, .music-sidebar.is-playing .sidebar-eq i { animation: none !important; }
+  .music-sidebar.is-playing .sidebar-eq i { transform: scaleY(.65); }
+}
