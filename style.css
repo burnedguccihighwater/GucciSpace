@@ -562,3 +562,7 @@ footer { position: relative; z-index: 2; }
 @media (prefers-reduced-motion:reduce) {
   .side-stars i, .bottom-mist i { animation: none !important; }
 }
+
+/* Public profile: three equally spaced navigation links, no editing controls. */
+.nav { flex-wrap: nowrap; }
+.nav-link { flex: 1 1 0; }
