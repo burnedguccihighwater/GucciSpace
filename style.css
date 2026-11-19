@@ -702,3 +702,35 @@ footer { position: relative; z-index: 2; }
 @keyframes exit-lighter-strike { 0%{transform:rotate(10deg)} 42%{transform:rotate(-10deg) translateY(-7px)} 100%{transform:rotate(0deg) translateY(-4px)} }
 @keyframes exit-wheel { from{background-position:0 0} to{background-position:10px 0} }
 @media(prefers-reduced-motion:reduce){[data-state="lighting"] .exit-lighter,[data-state="lighting"] .lighter-wheel{animation:none!important}}
+
+/* Exit Galaxy: uncropped scene and larger tactile objects. */
+.exit-world { background: #060713 url("assets/exit-galaxy.svg") center / contain no-repeat; animation:none; }
+.exit-world.has-original { background-image:url("assets/exit-galaxy-bg.webp"); }
+.exit-world::before { content:"";position:absolute;inset:0;z-index:-1;background:inherit;background-size:cover;filter:blur(36px) brightness(.35);opacity:.65; }
+.exit-world::after { content:"";position:absolute;inset:0;background:inherit;background-size:contain; }
+.exit-vignette { background:radial-gradient(ellipse at center,transparent 40%,#02040b33 100%); }
+.exit-pack { width:clamp(165px,27vw,225px);height:auto;aspect-ratio: .60;bottom:12%;transform:translateX(-50%) rotate(-4deg); }
+.pack-front { border-radius:3px 2px 3px 3px;box-shadow:inset -6px 0 8px #02091d70,8px 10px 26px #000b; }
+.pack-front::after { content:"";position:absolute;inset:0 0 0 auto;width:5%;background:linear-gradient(90deg,#ffffff25,#0005);pointer-events:none;z-index:4; }
+.pack-lid{font-size:clamp(15px,3vw,22px);box-shadow:inset 0 2px 2px #bcd3ed50}
+.pack-face>b{font-size:clamp(23px,3.5vw,32px);letter-spacing:-1px}
+.pack-face .pack-jp{font-size:12px}.pack-face small{font-size:8px}.pack-face strong{font-size:24px}
+.pack-foil i { width:14%; height:80%;background:linear-gradient(90deg,#a9a6aa,#f9f8ef 38%,#d8d6cf 81%,#8c8a8a);box-shadow:inset 0 4px 1px #b6ad95; }
+.exit-cig { width:10%;height:81%;top:-39%;left:41%;background:linear-gradient(90deg,#0003,transparent 26%,#fff3 43%,#0003),linear-gradient(180deg,#c4b8a0 0 2%,#eae6dd 2% 74%,#b68649 74% 100%);border-radius:40% 40% 3px 3px; }
+.exit-cig::after {content:"";position:absolute;top:0;left:0;right:0;height:5px;border-radius:50%;background:radial-gradient(ellipse,#9c836a 0 48%,#e2daca 54% 100%);}
+.exit-held { pointer-events:auto; padding:0;border:0;left:50%; bottom:10%;width:clamp(190px,38vw,310px);height:clamp(17px,2.5vw,24px);border-radius:4px 8px 8px 4px;background:linear-gradient(0deg,#0004,transparent 30%,#fff4 52%,#0002),linear-gradient(90deg,#b98950 0 25%,#d6ad6d 25% 26%,#e5e1d9 26% 97%,#77746e 97%);transition:transform .8s ease,bottom .8s ease;cursor:pointer; }
+.exit-held:disabled {cursor:default;}
+.exit-held::before { content:"";position:absolute;inset:-16px; }
+.exit-held .exit-ember{height:100%;right:0;top:0}
+[data-state="inhaling"] .exit-held{transform:translateX(-55%) rotate(-9deg) scale(1.22);bottom:-1%}
+[data-state="inhaling"] .exit-ember{background:#ff9d52;box-shadow:0 0 9px #ff6926,0 0 21px #ff8138}
+[data-state="exhaling"] .exit-smoke{display:block}
+.exit-lighter { width:56px;height:115px;left:72%;bottom:19%;padding:0; }
+.exit-lighter .lighter-wheel {height:29px}.exit-lighter .lighter-case{height:84px}
+.exit-exhale{position:absolute;inset:0;pointer-events:none;display:none;overflow:hidden;z-index:6}
+[data-state="exhaling"] .exit-exhale{display:block}
+.exit-exhale i{position:absolute;left:12%;bottom:-35%;width:76%;height:70%;background:url("assets/ground-smoke.svg") center/100% 100%;opacity:0;filter:blur(2px);animation:exit-exhale 2s ease-out both}
+.exit-exhale i:nth-child(2){animation-delay:.15s;left:26%;width:64%;}.exit-exhale i:nth-child(3){animation-delay:.3s;left:0;width:70%;}
+@keyframes exit-exhale{0%{transform:translateY(15%) scale(.65);opacity:0}24%{opacity:.35}100%{transform:translateY(-80%) scale(1.35);opacity:0}}
+@media(max-width:640px){.exit-world{background-size:contain}.exit-pack{bottom:15%}.exit-held{left:40%;bottom:12%;width:clamp(190px,55vw,280px)}.exit-lighter{left:auto;right:16px;bottom:19%}.exit-pocket button{padding:12px}.pocket-box{width:43px;height:58px}}
+@media(prefers-reduced-motion:reduce){.exit-exhale i{animation:none!important}.exit-held{transition:none}}
