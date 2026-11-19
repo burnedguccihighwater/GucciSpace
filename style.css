@@ -515,34 +515,35 @@ body { position: relative; min-height: 100vh; }
   46% { opacity: .94; transform: translate(-50%,-50%) scale(1.13); }
   72% { opacity: .43; transform: translate(-50%,-50%) scale(.92); }
 }
-/* Anchored to the document footer, not the viewport; mist is decorative only. */
-.bottom-mist { position: absolute; bottom: 0; left: 0; width: 100%; height: clamp(90px, 14vw, 185px); overflow: hidden; pointer-events: none; z-index: 1; }
-.bottom-mist::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to top,#8fcbef20,transparent 75%); }
-.bottom-mist i { position: absolute; inset: auto -15% -22% -15%; height: 92%; pointer-events: none; filter: blur(9px); }
+/* Ground smoke: textured turbulent banks, not blurred light spots. */
+.bottom-mist {
+  position: absolute; bottom: 0; left: 0; width: 100%;
+  height: clamp(160px, 22vw, 300px); overflow: hidden;
+  pointer-events: none; z-index: 1;
+}
+.bottom-mist i {
+  position: absolute; left: -18%; bottom: -1px; width: 136%; height: 100%;
+  pointer-events: none; background: url("assets/ground-smoke.svg?v=1") center bottom / 100% 100% no-repeat;
+  transform-origin: center bottom;
+}
 .bottom-mist i:nth-child(1) {
-  background: radial-gradient(ellipse at 8% 75%,#b7e0fa55,transparent 24%),
-              radial-gradient(ellipse at 35% 92%,#88c8ef66,transparent 31%),
-              radial-gradient(ellipse at 67% 78%,#c6e6ff47,transparent 27%),
-              radial-gradient(ellipse at 92% 85%,#8cc8ed55,transparent 28%);
-  animation: gucci-mist-drift 22s ease-in-out infinite alternate;
+  opacity: .66; animation: gucci-smoke-bank 28s ease-in-out infinite alternate;
 }
 .bottom-mist i:nth-child(2) {
-  bottom: -9%; height: 77%; opacity: .62;
-  background: radial-gradient(ellipse at 21% 93%,#b7dfff55,transparent 27%),
-              radial-gradient(ellipse at 53% 92%,#88bee65c,transparent 33%),
-              radial-gradient(ellipse at 81% 100%,#c0e4fa55,transparent 28%);
-  animation: gucci-mist-drift 31s ease-in-out -13s infinite alternate-reverse;
+  height: 82%; opacity: .53; width: 152%; left: -26%;
+  animation: gucci-smoke-counterflow 39s ease-in-out -16s infinite alternate;
 }
 .bottom-mist i:nth-child(3) {
-  bottom: -4%; height: 48%; opacity: .55;
-  background: radial-gradient(ellipse at 15% 100%,#c0e4fa6b,transparent 35%),
-              radial-gradient(ellipse at 59% 94%,#aecde65c,transparent 40%),
-              radial-gradient(ellipse at 95% 100%,#a4d7f967,transparent 32%);
-  animation: gucci-mist-drift 27s ease-in-out -6s infinite alternate;
+  height: 59%; opacity: .46; width: 150%; left: -25%;
+  animation: gucci-smoke-bank 34s ease-in-out -21s infinite alternate;
 }
-@keyframes gucci-mist-drift {
-  from { transform: translate3d(-4%, 1%, 0) scaleY(.87); }
-  to { transform: translate3d(4%, -9%, 0) scaleY(1.08); }
+@keyframes gucci-smoke-bank {
+  from { transform: translate3d(-8%, 0, 0) scaleY(.89); }
+  to { transform: translate3d(8%, -5%, 0) scaleY(1.08); }
+}
+@keyframes gucci-smoke-counterflow {
+  from { transform: translate3d(8%, -2%, 0) scale(-1, .94); }
+  to { transform: translate3d(-8%, 0, 0) scale(-1, 1.10); }
 }
 footer { position: relative; z-index: 2; }
 @media (max-width:800px) {
@@ -553,8 +554,10 @@ footer { position: relative; z-index: 2; }
   .side-stars i.star-cross::before { height: 5px; }
   .side-stars i.star-cross::after { width: 5px; }
   .side-stars i:nth-child(3n) { display: none; }
-  .bottom-mist { height: 100px; }
-  .bottom-mist i { filter: blur(6px); }
+  .bottom-mist { height: 155px; }
+  .bottom-mist i { width: 160%; left: -30%; background-size: 165% 100%; }
+  .bottom-mist i:nth-child(2) { width: 175%; left: -37.5%; }
+  .bottom-mist i:nth-child(3) { width: 165%; left: -32.5%; }
 }
 @media (prefers-reduced-motion:reduce) {
   .side-stars i, .bottom-mist i { animation: none !important; }
