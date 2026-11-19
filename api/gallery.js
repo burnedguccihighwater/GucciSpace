@@ -115,4 +115,13 @@ export function createGalleryHandler({
   };
 }
 
-export default createGalleryHandler();
+// Published photos stay in Blob storage; the deployed gallery is read-only.
+const readGallery = createGalleryHandler();
+export default function publicGallery(req, res) {
+  if (req.method !== 'GET') {
+    res.setHeader('Allow', 'GET');
+    res.setHeader('Cache-Control', 'no-store');
+    return res.status(405).json({ error: 'method_not_allowed' });
+  }
+  return readGallery(req, res);
+}
