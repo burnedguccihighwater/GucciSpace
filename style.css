@@ -743,3 +743,11 @@ footer { position: relative; z-index: 2; }
 @media(max-height:500px){.exit-pack{width:clamp(110px,35dvh,185px);bottom:8%}.exit-cig{height:65%}}
 
 .exit-sound{position:absolute;left:12px;bottom:14px;z-index:9;padding:7px 10px;border:1px solid #85b7de44;border-radius:4px;color:#b9e4ff;background:#030d17d9;font:11px Arial,sans-serif;max-width:65%;}
+
+/* Radio signal monitor — independent of navigation and sized in device pixels. */
+.radio-console canvas { width:100%;height:clamp(58px,12vw,112px);min-height:0; }
+.sidebar-wave { display:block;width:100%;height:27px;margin-top:6px;border:1px solid #25465d;background:#020a14 repeating-linear-gradient(0deg,transparent 0 8px,#10283a 9px); }
+#radioVisualStatus { display:block;margin-top:2px;font-size:8px;letter-spacing:.7px;color:#66caff; }
+#music .music-player { margin:0 0 10px; }
+#music .track-list { max-height: min(56vh,520px); overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#25465d transparent; }
+@media(max-width:640px){.sidebar-wave{height:20px;margin-top:4px}.radio-console canvas{height:68px}#radioVisualStatus{font-size:7px}#music .track-list{max-height:52dvh}}
