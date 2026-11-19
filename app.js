@@ -61,6 +61,7 @@
   function syncPlayer(){
     const a=$('trackAudio'),active=!!currentTrack,playing=active&&!a.paused;
     $('musicPlayer').hidden=!active;
+    const mini=$('sidebarPlay');if(mini){mini.disabled=!active&&!playlist.some(t=>validAudio(t.src));mini.textContent=playing?'Ⅱ':'▶';mini.setAttribute('aria-label',playing?'Пауза':'Воспроизвести');}
     $('playerToggle').textContent=playing?'Ⅱ':'▶';$('playerToggle').setAttribute('aria-label',playing?'Пауза':'Воспроизвести');
     $('playerNowTitle').textContent=currentTrack?.title||'';
     $('playerNowArtist').textContent=currentTrack?.artist||'';
@@ -78,6 +79,7 @@
   function renderTracks(){
     const list=$('tracksList');playlist=telegramData?.connected&&Array.isArray(telegramData.tracks)?telegramData.tracks.slice(0,15):[];
     $('trackCount').textContent=playlist.length+' tracks';
+    if($('sidebarTrackCount'))$('sidebarTrackCount').textContent=playlist.length+' tracks';
     $('featuredTrack').textContent=currentTrack?.title||playlist[0]?.title||profile.music||'no tracks yet';
     $('displayMusic').textContent=playlist[0]?.title||profile.music||'—';
     list.replaceChildren();
@@ -117,7 +119,24 @@
     }
   }
 
-  async function init(){initPlayer();renderProfile();$('year').textContent=new Date().getFullYear();
+  function initMusicTab(){
+    const panel=$('music'),tab=$('musicTab');if(!panel||!tab)return;
+    const siblings=Array.from(panel.parentElement.children).filter(el=>el!==panel);
+    function route(hash){
+      const music=hash==='#music';
+      panel.hidden=!music;siblings.forEach(el=>{el.hidden=music;});
+      if(music)tab.setAttribute('aria-current','page');else tab.removeAttribute('aria-current');
+      document.querySelectorAll('.nav-link').forEach(a=>a.classList.toggle('active',!music&&(a.getAttribute('href')===(hash==='#top'||!hash?'#profile':hash))));
+    }
+    document.addEventListener('click',e=>{
+      const a=e.target.closest('a[href^="#"]');if(!a||e.defaultPrevented||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
+      const hash=a.getAttribute('href');if(hash==='#music'||!panel.hidden)route(hash);
+    });
+    window.addEventListener('hashchange',()=>route(location.hash));
+    $('sidebarPlay')?.addEventListener('click',()=>playTrack(currentTrack||playlist.find(t=>validAudio(t.src))));
+    route(location.hash);
+  }
+  async function init(){initPlayer();initMusicTab();renderProfile();$('year').textContent=new Date().getFullYear();
     $('editOpen').addEventListener('click',showEditor);$('editClose').addEventListener('click',hideEditor);$('editorBackdrop').addEventListener('click',e=>{if(e.target===$('editorBackdrop'))hideEditor();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('editorBackdrop').hidden)hideEditor();});
     $('editForm').addEventListener('submit',e=>{e.preventDefault();const next={};for(const field of Object.keys(defaultProfile)){const input=$('edit'+field[0].toUpperCase()+field.slice(1));next[field]=(input?.value||'').trim();}profile=next;useTelegramBio=$('syncBioToggle').checked;localStorage.setItem('gucci-space-use-tg-bio',String(useTelegramBio));localStorage.setItem(key,JSON.stringify(profile));renderProfile();renderTracks();hideEditor();toast('Изменения сохранены ♡');});
     $('avatarInput').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file||!file.type.startsWith('image/'))return;try{await putMedia({id:'avatar',name:file.name,created:Date.now(),blob:file});await renderAvatar();$('editFeedback').textContent='Фото профиля сохранено ♡';}catch(err){console.error(err);$('editFeedback').textContent='Не удалось сохранить фото.';}e.target.value='';});
