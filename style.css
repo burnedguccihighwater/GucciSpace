@@ -696,3 +696,9 @@ footer { position: relative; z-index: 2; }
 @keyframes exit-smoke-rise{0%{transform:translate(0,35px) scale(.25);opacity:0}20%{opacity:.7}100%{transform:translate(-15px,-90px) scale(1.8);opacity:0}}
 @media(max-width:640px){.exit-mode .nav{min-height:35px}.exit-galaxy{inset:35px 0 0}.exit-world{background-size:auto 100%}.exit-held{bottom:10%}.exit-pocket{right:15px;bottom:20px}}
 @media(prefers-reduced-motion:reduce){.exit-world,.exit-cig,.exit-pack,.exit-smoke i,.exit-flame,.exit-sparks i{animation:none!important}.exit-eyelid{transition:none!important}}
+
+[data-state="lighting"] .exit-lighter { animation:exit-lighter-strike .42s ease-out both; }
+[data-state="lighting"] .lighter-wheel { animation:exit-wheel .18s linear 2; }
+@keyframes exit-lighter-strike { 0%{transform:rotate(10deg)} 42%{transform:rotate(-10deg) translateY(-7px)} 100%{transform:rotate(0deg) translateY(-4px)} }
+@keyframes exit-wheel { from{background-position:0 0} to{background-position:10px 0} }
+@media(prefers-reduced-motion:reduce){[data-state="lighting"] .exit-lighter,[data-state="lighting"] .lighter-wheel{animation:none!important}}
