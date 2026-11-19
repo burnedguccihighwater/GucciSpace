@@ -741,3 +741,5 @@ footer { position: relative; z-index: 2; }
 .exit-world::before { z-index:auto;background:var(--exit-photo) center/cover no-repeat;transform:scale(1.12);filter:blur(32px) brightness(.34);opacity:.76; }
 .exit-world::after { background:var(--exit-photo) center/contain no-repeat; }
 @media(max-height:500px){.exit-pack{width:clamp(110px,35dvh,185px);bottom:8%}.exit-cig{height:65%}}
+
+.exit-sound{position:absolute;left:12px;bottom:14px;z-index:9;padding:7px 10px;border:1px solid #85b7de44;border-radius:4px;color:#b9e4ff;background:#030d17d9;font:11px Arial,sans-serif;max-width:65%;}
