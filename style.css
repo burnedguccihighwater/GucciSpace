@@ -367,3 +367,26 @@ footer a { color: #b5d295; }
   .sidebar-track .rec { font-size: 7px; letter-spacing: 0; }
   .sidebar-play { flex-basis: 24px; width: 24px; height: 28px; }
 }
+
+/* A shelf of vertical Steam game boxes, with the original continuous reel. */
+.games-reel { padding: 5px 0 7px; }
+.games-track, .games-group { align-items: stretch; }
+.games-group { gap: 10px; padding-right: 10px; }
+.game-tile { flex: 0 0 132px; width: 132px; }
+.game-card { height: 100%; position: relative; overflow: hidden; border-color: #465637; background: #0b1008; box-shadow: 1px 2px 0 #000; }
+.game-art { aspect-ratio: 2 / 3; isolation: isolate; background: linear-gradient(145deg, #23301a, #0a0f07 76%); }
+.game-art::after { content: ""; position: absolute; z-index: 2; inset: 0; pointer-events: none; box-shadow: inset 4px 0 0 #0005, inset 5px 0 0 #ffffff21, inset -1px 0 0 #0007; }
+.game-art > span { font-size: 11px; letter-spacing: .4px; padding: 9px; text-align: center; overflow-wrap: anywhere; color: #9eb887; }
+.game-art img { object-fit: cover; object-position: center; z-index: 1; background: #10170b; }
+.game-art-landscape img { object-fit: contain; background: linear-gradient(145deg, #23301a, #0a0f07 76%); }
+.game-name { display: block; padding: 5px 6px; font-size: 10px; line-height: 1.5; border-top: 1px solid #334329; }
+.game-card:hover, .game-card:focus-visible { border-color: var(--accent); }
+@media (min-width: 1000px) { .game-tile { flex-basis: 140px; width: 140px; } }
+@media (max-width: 640px) {
+  .games-reel { padding: 3px 0 4px; }
+  .games-group { gap: 5px; padding-right: 5px; }
+  .game-tile { flex-basis: clamp(57px, 18vw, 95px); width: clamp(57px, 18vw, 95px); }
+  .game-name { padding: 4px 3px; font-size: 8px; }
+  .game-art > span { padding: 4px; font-size: 8px; }
+  .game-art::after { box-shadow: inset 2px 0 0 #0005, inset 3px 0 0 #ffffff21, inset -1px 0 0 #0007; }
+}
