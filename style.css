@@ -734,3 +734,10 @@ footer { position: relative; z-index: 2; }
 @keyframes exit-exhale{0%{transform:translateY(15%) scale(.65);opacity:0}24%{opacity:.35}100%{transform:translateY(-80%) scale(1.35);opacity:0}}
 @media(max-width:640px){.exit-world{background-size:contain}.exit-pack{bottom:15%}.exit-held{left:40%;bottom:12%;width:clamp(190px,55vw,280px)}.exit-lighter{left:auto;right:16px;bottom:19%}.exit-pocket button{padding:12px}.pocket-box{width:43px;height:58px}}
 @media(prefers-reduced-motion:reduce){.exit-exhale i{animation:none!important}.exit-held{transition:none}}
+
+/* The full image remains visible, including both edges; a soft dark extension fills portrait screens. */
+.exit-world { --exit-photo:url("assets/exit-galaxy.svg");background:#060713; }
+.exit-world.has-original { --exit-photo:url("assets/exit-galaxy-bg.webp");background:#060713; }
+.exit-world::before { z-index:auto;background:var(--exit-photo) center/cover no-repeat;transform:scale(1.12);filter:blur(32px) brightness(.34);opacity:.76; }
+.exit-world::after { background:var(--exit-photo) center/contain no-repeat; }
+@media(max-height:500px){.exit-pack{width:clamp(110px,35dvh,185px);bottom:8%}.exit-cig{height:65%}}
