@@ -1,6 +1,10 @@
 const $ = id => document.getElementById(id);
-let pending = false, signature = null;
+let pending = false, signature = null, currentPhotos = [], selected = 0;
+const viewer = $('photoViewer');
+function showPhoto(i){if(!currentPhotos.length)return;selected=(i+currentPhotos.length)%currentPhotos.length;const p=currentPhotos[selected];$('photoViewerImage').src=p.src;$('photoViewerCount').textContent=(selected+1)+' / '+currentPhotos.length;if(!viewer.open)viewer.showModal();}
+$('photoClose').addEventListener('click',()=>viewer.close());$('photoPrev').addEventListener('click',()=>showPhoto(selected-1));$('photoNext').addEventListener('click',()=>showPhoto(selected+1));viewer.addEventListener('click',e=>{if(e.target===viewer)viewer.close()});viewer.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')showPhoto(selected-1);if(e.key==='ArrowRight')showPhoto(selected+1)});viewer.addEventListener('close',()=>{$('photoViewerImage').removeAttribute('src')});
 function render(photos) {
+  currentPhotos=photos;
   $('galleryEmpty').hidden = photos.length > 0;
   const next = JSON.stringify(photos.map(p => [p.id, p.src]));
   if (next === signature) return;
@@ -9,7 +13,7 @@ function render(photos) {
     const link = document.createElement('a'); link.href = photo.src; link.target = '_blank'; link.rel = 'noopener noreferrer';
     link.setAttribute('aria-label', 'Открыть фотографию Gucci ' + (i+1));
     const img = document.createElement('img'); img.src = photo.src; img.alt = 'Фотография Gucci ' + (i+1); img.loading = 'lazy'; img.decoding = 'async';
-    link.append(img); item.append(link); return item;
+    link.addEventListener('click',e=>{e.preventDefault();showPhoto(i)});link.append(img); item.append(link); return item;
   });
   $('galleryGrid').replaceChildren(...items); signature = next;
 }
