@@ -60,34 +60,82 @@
     if(active){$('featuredTrack').textContent=currentTrack.title||'Unknown track';$('displayMusic').textContent=currentTrack.title||'Unknown track';}
     document.querySelectorAll('.track-play[data-src]').forEach(b=>{const selected=b.dataset.src===currentTrack?.src;b.textContent=selected&&playing?'Ⅱ':'▶';b.setAttribute('aria-label',selected&&playing?'Пауза':'Воспроизвести');b.closest('.track-row')?.classList.toggle('track-active',selected);});
   }
-  let audioContext=null,analyser=null,visualFrame=0,frequencyData=null,waveData=null,mediaSource=null;
-  function drawRadio(canvas,live){
+  // Real octave / logarithmic spectrum, with separate peak histories for both displays.
+  let audioContext=null,analyser=null,visualFrame=0,frequencyData=null,mediaSource=null;
+  let spectrumMode=10,visualLast=0;
+  const monitors=new Map();
+  const octaveCenters=[31.5,63,125,250,500,1000,2000,4000,8000,16000];
+  const octaveLabels=['31','62','125','250','500','1K','2K','4K','8K','16K'];
+  function bandBounds(count){
+    if(count===10)return octaveCenters.map(f=>[f/Math.SQRT2,f*Math.SQRT2]);
+    return Array.from({length:count},(_,i)=>[25*Math.pow(20000/25,i/count),25*Math.pow(20000/25,(i+1)/count)]);
+  }
+  function bandLevels(count,live){
+    if(!live)return Array(count).fill(0);
+    const binHz=audioContext.sampleRate/analyser.fftSize;
+    return bandBounds(count).map(([low,high])=>{
+      const from=Math.max(1,Math.min(frequencyData.length-1,Math.ceil(low/binHz)));
+      const to=Math.max(from,Math.min(frequencyData.length-1,Math.floor(high/binHz)));
+      let power=0;
+      for(let i=from;i<=to;i++){const db=frequencyData[i];if(Number.isFinite(db))power+=Math.pow(10,db/10);}
+      const db=10*Math.log10(Math.max(1e-12,power/(to-from+1)));
+      return Math.max(0,Math.min(1,(db+88)/68));
+    });
+  }
+  function drawRadio(canvas,live,dt){
     if(!canvas||!canvas.getClientRects().length)return;
     const rect=canvas.getBoundingClientRect();if(rect.width<1||rect.height<1)return;
-    const dpr=Math.min(window.devicePixelRatio||1,2);
-    const w=Math.max(1,Math.round(rect.width*dpr)),h=Math.max(1,Math.round(rect.height*dpr));
+    const dpr=Math.min(window.devicePixelRatio||1,2),w=Math.round(rect.width*dpr),h=Math.round(rect.height*dpr);
     if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
     const g=canvas.getContext('2d');if(!g)return;
     g.clearRect(0,0,w,h);
-    if(!live){g.strokeStyle='#366789';g.lineWidth=dpr;g.beginPath();g.moveTo(0,h*.5);g.lineTo(w,h*.5);g.stroke();return;}
-    const mini=canvas.id==='sidebarWave',count=mini?20:48,step=w/count;
-    const gradient=g.createLinearGradient(0,h,0,0);gradient.addColorStop(0,'#1266a2');gradient.addColorStop(.6,'#36b7f4');gradient.addColorStop(1,'#c8efff');
-    g.fillStyle=gradient;
+    const mini=canvas.id==='sidebarWave',count=mini?18:spectrumMode,segments=mini?7:20;
+    let memory=monitors.get(canvas.id);
+    if(!memory||memory.count!==count){memory={count,levels:Array(count).fill(0),peaks:Array(count).fill(0),hold:Array(count).fill(0)};monitors.set(canvas.id,memory);}
+    const levels=bandLevels(count,live);
+    const pad=mini?3*dpr:Math.min(13*dpr,w*.055),top=mini?3*dpr:10*dpr;
+    const bottom=mini?h-3*dpr:h*.74,step=(w-2*pad)/count,barWidth=Math.max(1,step*(count===10?.64:.72));
+    const pitch=Math.max(1,(bottom-top)/segments),gap=Math.min(pitch*.29,mini?1*dpr:2*dpr),segHeight=Math.max(.6,pitch-gap);
+    const colors=['#46e969','#62fa72','#87ff8a','#bcffd0','#e4ffe2'];
     for(let i=0;i<count;i++){
-      const bin=Math.min(frequencyData.length-1,Math.floor(1+Math.pow(i/(count-1),1.8)*frequencyData.length*.72));
-      const v=frequencyData[bin]/255,bar=Math.max(1*dpr,Math.pow(v,1.25)*h*.82);
-      g.fillRect(i*step+step*.19,h-bar,Math.max(1,step*.62),bar);
+      const target=levels[i],previous=memory.levels[i];
+      const level=live?previous+(target-previous)*(1-Math.exp(-dt*(target>previous?24:8))):0;
+      memory.levels[i]=level;
+      if(!live){memory.peaks[i]=0;memory.hold[i]=0;}
+      else if(level>=memory.peaks[i]){memory.peaks[i]=level;memory.hold[i]=.40;}
+      else if(memory.hold[i]>0)memory.hold[i]-=dt;
+      else memory.peaks[i]=Math.max(level,memory.peaks[i]-dt*.57);
+      const x=pad+i*step+(step-barWidth)/2,active=Math.round(level*segments);
+      for(let j=0;j<segments;j++){
+        const y=bottom-(j+1)*pitch;
+        g.fillStyle='#10271b';g.fillRect(x,y,barWidth,segHeight);
+        if(j>=active)continue;
+        const color=colors[Math.min(4,Math.floor(j/segments*5))];
+        g.fillStyle=color;g.shadowColor='#35ff6c';g.shadowBlur=mini?1.6*dpr:3*dpr;g.fillRect(x,y,barWidth,segHeight);g.shadowBlur=0;
+        if(!mini){g.fillStyle='#ecffe7';g.globalAlpha=.24;g.fillRect(x,y,barWidth,Math.max(.6,segHeight*.18));g.globalAlpha=1;
+          const reflectedY=bottom+3*dpr+j*pitch*.26;
+          if(reflectedY<h-12*dpr){g.globalAlpha=.17*(1-j/segments);g.fillStyle=color;g.fillRect(x,reflectedY,barWidth,Math.max(.5,segHeight*.26));g.globalAlpha=1;}
+        }
+      }
+      if(live&&memory.peaks[i]>.025){
+        const peak=Math.min(segments-1,Math.max(0,Math.ceil(memory.peaks[i]*segments)-1));
+        const y=bottom-(peak+1)*pitch;g.fillStyle='#d9ffe1';g.shadowColor='#a1ff9e';g.shadowBlur=3*dpr;g.fillRect(x,y,barWidth,Math.max(1,segHeight*.38));g.shadowBlur=0;
+      }
     }
-    if(!mini){g.strokeStyle='#d4f5ff';g.lineWidth=1.4*dpr;g.shadowColor='#66caff';g.shadowBlur=5*dpr;g.beginPath();
-      for(let i=0;i<waveData.length;i++){const x=i/(waveData.length-1)*w,y=h*.45+(waveData[i]-128)/128*h*.40;i?g.lineTo(x,y):g.moveTo(x,y);}g.stroke();g.shadowBlur=0;}
+    if(!mini){g.fillStyle='#9ecbab';g.font=Math.min(10*dpr,step*.43)+'px monospace';g.textAlign='center';g.textBaseline='bottom';
+      if(count===10)octaveLabels.forEach((label,i)=>g.fillText(label,pad+(i+.5)*step,h-3*dpr));
+      else ['31','125','500','2K','8K','16K'].forEach((label,i)=>{const f=[31,125,500,2000,8000,16000][i];g.fillText(label,pad+Math.log(f/25)/Math.log(20000/25)*(w-2*pad),h-3*dpr);});
+    }
   }
   function updateVisualizer(){
     if(visualFrame)cancelAnimationFrame(visualFrame);visualFrame=0;
+    const now=performance.now(),dt=Math.max(.008,Math.min(.1,(now-visualLast)/1000||.016));visualLast=now;
     const audio=$('trackAudio'),playing=!audio.paused&&!audio.ended&&!document.hidden;
     const live=playing&&!!analyser&&audioContext?.state==='running';
-    if(live){analyser.getByteFrequencyData(frequencyData);analyser.getByteTimeDomainData(waveData);}
-    for(const id of ['radioWave','sidebarWave'])drawRadio($(id),live);
-    const status=$('radioVisualStatus');if(status)status.textContent=live?'LIVE SPECTRUM':playing?'AUDIO SIGNAL · CONNECTING':'STANDBY';
+    if(live)analyser.getFloatFrequencyData(frequencyData);
+    for(const id of ['radioWave','sidebarWave'])drawRadio($(id),live,dt);
+    const status=$('radioVisualStatus'),label=live?'LIVE SPECTRUM':playing?'CONNECTING':'STANDBY';
+    if(status&&status.textContent!==label)status.textContent=label;
     if(playing)visualFrame=requestAnimationFrame(updateVisualizer);
   }
   function activateVisualizer(){
@@ -95,9 +143,9 @@
     if(!Ctx){updateVisualizer();return;}
     try{
       if(!audioContext){
-        audioContext=new Ctx();
-        analyser=audioContext.createAnalyser();analyser.fftSize=1024;analyser.smoothingTimeConstant=.73;analyser.minDecibels=-100;analyser.maxDecibels=-25;
-        frequencyData=new Uint8Array(analyser.frequencyBinCount);waveData=new Uint8Array(analyser.fftSize);
+        audioContext=new Ctx();analyser=audioContext.createAnalyser();
+        analyser.fftSize=4096;analyser.smoothingTimeConstant=.66;analyser.minDecibels=-100;analyser.maxDecibels=-20;
+        frequencyData=new Float32Array(analyser.frequencyBinCount);
         mediaSource=audioContext.createMediaElementSource(audio);
         mediaSource.connect(audioContext.destination);mediaSource.connect(analyser);
         audioContext.addEventListener('statechange',updateVisualizer);
@@ -106,6 +154,10 @@
     }catch(err){console.warn('Radio visualizer:',err?.message||err);}
     updateVisualizer();
   }
+  $('radioSpectrumMode')?.addEventListener('click',()=>{
+    spectrumMode=spectrumMode===10?32:10;
+    $('radioSpectrumMode').textContent=spectrumMode+' BAND';$('radioSpectrumMode').setAttribute('aria-pressed',String(spectrumMode===32));updateVisualizer();
+  });
   function refillQueue(exclude){
     radioQueue=playlist.filter(t=>validAudio(t.src)&&t.src!==exclude).map(t=>t.src);
     for(let i=radioQueue.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[radioQueue[i],radioQueue[j]]=[radioQueue[j],radioQueue[i]];}
