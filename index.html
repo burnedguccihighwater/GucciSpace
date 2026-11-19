@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#050505"/>
 <meta name="description" content="Gucci Space — музыка, фотографии, игры и мой уголок интернета."/>
 <title>Gucci's Space ☆</title>
-<link rel="stylesheet" href="style.css?v=desktop-mobile-2"/>
+<link rel="stylesheet" href="style.css?v=music-sidebar-1"/>
 </head>
 <body>
 <div class="global-sky" aria-hidden="true"></div>
@@ -22,7 +22,6 @@
 <a class="nav-link active" href="#profile">Home</a>
 <a class="nav-link" href="#about">About</a>
 <a class="nav-link" href="#gallery">Photos</a>
-<a class="nav-link" href="#music">Music</a>
 <a class="nav-link" href="#games">Games</a>
 <button class="edit-nav" id="editOpen" type="button">✎ Edit my space</button>
 </nav>
@@ -41,17 +40,14 @@
 <div><span>Location:</span><b id="displayLocation">internet</b></div>
 <div><span>Listening to:</span><b id="displayMusic">my playlist</b></div>
 </div>
-<div class="profile-shortcuts">View my: <a href="#gallery">Pics</a><span>|</span><a href="#music">Music</a><span>|</span><a href="#games">Games</a><span>|</span><a href="#about">About</a></div>
+<div class="profile-shortcuts">View my: <a href="#gallery">Pics</a><span>|</span><a href="#games">Games</a><span>|</span><a href="#about">About</a></div>
 </div>
 </section>
-<section class="panel currently-panel">
-<div class="panel-title">On my profile</div>
+<section class="panel currently-panel music-sidebar" aria-label="Музыка">
+<a class="music-tab" href="#music" id="musicTab" aria-controls="music"><span>♫ Music</span><span class="music-count" id="sidebarTrackCount">0 tracks</span><span aria-hidden="true">›</span></a>
 <div class="mini-player"><div class="mini-player-overlay">
-<div class="rec">♫ THE SOUNDTRACK</div>
-<div class="player-title" id="featuredTrack">my playlist</div>
-<div class="tiny-eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-<small id="musicHint">Синхронизация треков появится после подключения</small>
-<a class="playlist-link" href="#music">Open playlist →</a>
+<div class="sidebar-now"><div class="sidebar-track"><span class="rec">NOW PLAYING</span><div class="player-title" id="featuredTrack">my playlist</div></div><button class="sidebar-play" type="button" id="sidebarPlay" aria-label="Воспроизвести" disabled>▶</button></div>
+<small id="musicHint" class="visually-hidden">Синхронизация треков появится после подключения</small>
 </div></div>
 </section>
 <section class="panel url-panel"><div class="panel-title">My Space URL:</div><div class="url-body"><a href="https://gucci-space.vercel.app">gucci-space.vercel.app</a></div></section>
@@ -63,10 +59,10 @@
 <div class="panel-title">Gucci's blurbs</div>
 <div class="about-content"><h2 class="section-overline">About me:</h2><p class="about-bio" id="displayBio">Это моё маленькое место в интернете. Здесь будет всё, что мне нравится: музыка, фотографии, мысли и немного космоса. ♡</p><div class="about-signature">somewhere between a song &amp; a memory.</div></div>
 </section>
-<section class="panel music-panel" id="music">
-<div class="panel-title"><span>Gucci's music</span><span class="music-count" id="trackCount">0 tracks</span></div>
+<section class="panel music-panel" id="music" hidden aria-labelledby="musicHeading">
+<div class="panel-title"><span id="musicHeading">Gucci's music</span><span class="music-count" id="trackCount">0 tracks</span></div>
 <div class="music-body">
-<p class="music-intro">press play. stay a little.</p>
+<div class="music-page-top"><p class="music-intro">press play. stay a little.</p><a href="#profile">← Home</a></div>
 <div class="track-list" id="tracksList" aria-live="polite"><div class="music-empty">Треки появятся после синхронизации.</div></div>
 <div class="music-player" id="musicPlayer" hidden>
 <div class="now-playing"><span>♫ NOW PLAYING</span><strong id="playerNowTitle"></strong><small id="playerNowArtist"></small></div>
@@ -135,7 +131,7 @@
 </div>
 </div>
 <div aria-live="polite" class="toast" id="toast" role="status"></div>
-<script src="app.js?v=gallery-1"></script>
+<script src="app.js?v=music-sidebar-1"></script>
 <script type="module" src="games.js?v=showcase-1"></script>
 <script type="module" src="gallery.js?v=shared-1"></script>
 </body>
