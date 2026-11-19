@@ -57,22 +57,54 @@
     $('playerElapsed').textContent=timeLabel(a.currentTime);$('playerTotal').textContent=timeLabel(Number.isFinite(a.duration)?a.duration:Number(currentTrack?.duration)||0);
     $('playerSeek').value=Number.isFinite(a.duration)&&a.duration>0?String(Math.round(a.currentTime/a.duration*1000)):'0';
     $('playerSeek').disabled=!Number.isFinite(a.duration)||a.duration<=0;
-    if(active)$('featuredTrack').textContent=currentTrack.title||'Unknown track';
+    if(active){$('featuredTrack').textContent=currentTrack.title||'Unknown track';$('displayMusic').textContent=currentTrack.title||'Unknown track';}
     document.querySelectorAll('.track-play[data-src]').forEach(b=>{const selected=b.dataset.src===currentTrack?.src;b.textContent=selected&&playing?'Ⅱ':'▶';b.setAttribute('aria-label',selected&&playing?'Пауза':'Воспроизвести');b.closest('.track-row')?.classList.toggle('track-active',selected);});
   }
-  let audioContext,analyser,visualFrame=0;
+  let audioContext=null,analyser=null,visualFrame=0,frequencyData=null,waveData=null,mediaSource=null;
+  function drawRadio(canvas,live){
+    if(!canvas||!canvas.getClientRects().length)return;
+    const rect=canvas.getBoundingClientRect();if(rect.width<1||rect.height<1)return;
+    const dpr=Math.min(window.devicePixelRatio||1,2);
+    const w=Math.max(1,Math.round(rect.width*dpr)),h=Math.max(1,Math.round(rect.height*dpr));
+    if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
+    const g=canvas.getContext('2d');if(!g)return;
+    g.clearRect(0,0,w,h);
+    if(!live){g.strokeStyle='#366789';g.lineWidth=dpr;g.beginPath();g.moveTo(0,h*.5);g.lineTo(w,h*.5);g.stroke();return;}
+    const mini=canvas.id==='sidebarWave',count=mini?20:48,step=w/count;
+    const gradient=g.createLinearGradient(0,h,0,0);gradient.addColorStop(0,'#1266a2');gradient.addColorStop(.6,'#36b7f4');gradient.addColorStop(1,'#c8efff');
+    g.fillStyle=gradient;
+    for(let i=0;i<count;i++){
+      const bin=Math.min(frequencyData.length-1,Math.floor(1+Math.pow(i/(count-1),1.8)*frequencyData.length*.72));
+      const v=frequencyData[bin]/255,bar=Math.max(1*dpr,Math.pow(v,1.25)*h*.82);
+      g.fillRect(i*step+step*.19,h-bar,Math.max(1,step*.62),bar);
+    }
+    if(!mini){g.strokeStyle='#d4f5ff';g.lineWidth=1.4*dpr;g.shadowColor='#66caff';g.shadowBlur=5*dpr;g.beginPath();
+      for(let i=0;i<waveData.length;i++){const x=i/(waveData.length-1)*w,y=h*.45+(waveData[i]-128)/128*h*.40;i?g.lineTo(x,y):g.moveTo(x,y);}g.stroke();g.shadowBlur=0;}
+  }
+  function updateVisualizer(){
+    if(visualFrame)cancelAnimationFrame(visualFrame);visualFrame=0;
+    const audio=$('trackAudio'),playing=!audio.paused&&!audio.ended&&!document.hidden;
+    const live=playing&&!!analyser&&audioContext?.state==='running';
+    if(live){analyser.getByteFrequencyData(frequencyData);analyser.getByteTimeDomainData(waveData);}
+    for(const id of ['radioWave','sidebarWave'])drawRadio($(id),live);
+    const status=$('radioVisualStatus');if(status)status.textContent=live?'LIVE SPECTRUM':playing?'AUDIO SIGNAL · CONNECTING':'STANDBY';
+    if(playing)visualFrame=requestAnimationFrame(updateVisualizer);
+  }
   function activateVisualizer(){
-    const canvas=$('radioWave'),audio=$('trackAudio'),Ctx=window.AudioContext||window.webkitAudioContext;
-    if(!canvas||!Ctx)return;
+    const audio=$('trackAudio'),Ctx=window.AudioContext||window.webkitAudioContext;
+    if(!Ctx){updateVisualizer();return;}
     try{
-      if(!audioContext){audioContext=new Ctx();analyser=audioContext.createAnalyser();analyser.fftSize=256;const source=audioContext.createMediaElementSource(audio);source.connect(analyser);analyser.connect(audioContext.destination);}
-      if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});
-      if(visualFrame)return;
-      const ctx=canvas.getContext('2d'),data=new Uint8Array(analyser.fftSize);
-      const draw=()=>{visualFrame=0;if(audio.paused||audio.ended||document.hidden||$('music').hidden)return;
-        analyser.getByteTimeDomainData(data);ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='#66caff';ctx.lineWidth=1.7;ctx.beginPath();for(let i=0;i<data.length;i++){const x=i/(data.length-1)*canvas.width,y=data[i]/255*canvas.height;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();visualFrame=requestAnimationFrame(draw);};
-      visualFrame=requestAnimationFrame(draw);
-    }catch{}
+      if(!audioContext){
+        audioContext=new Ctx();
+        analyser=audioContext.createAnalyser();analyser.fftSize=1024;analyser.smoothingTimeConstant=.73;analyser.minDecibels=-100;analyser.maxDecibels=-25;
+        frequencyData=new Uint8Array(analyser.frequencyBinCount);waveData=new Uint8Array(analyser.fftSize);
+        mediaSource=audioContext.createMediaElementSource(audio);
+        mediaSource.connect(audioContext.destination);mediaSource.connect(analyser);
+        audioContext.addEventListener('statechange',updateVisualizer);
+      }
+      if(audioContext.state!=='running'&&audioContext.state!=='closed')audioContext.resume().then(updateVisualizer).catch(updateVisualizer);
+    }catch(err){console.warn('Radio visualizer:',err?.message||err);}
+    updateVisualizer();
   }
   function refillQueue(exclude){
     radioQueue=playlist.filter(t=>validAudio(t.src)&&t.src!==exclude).map(t=>t.src);
@@ -102,7 +134,7 @@
     $('trackCount').textContent=playlist.length+' tracks';
     if($('sidebarTrackCount'))$('sidebarTrackCount').textContent=playlist.length+' tracks';
     $('featuredTrack').textContent=currentTrack?.title||playlist[0]?.title||profile.music||'no tracks yet';
-    $('displayMusic').textContent=playlist[0]?.title||profile.music||'—';
+    $('displayMusic').textContent=currentTrack?.title||playlist[0]?.title||profile.music||'—';
     list.replaceChildren();
     if(!playlist.length){const empty=document.createElement('div');empty.className='music-empty';empty.textContent='✧ Треки появятся после подключения синхронизации с профилем Telegram.';list.append(empty);syncPlayer();return;}
     for(const track of playlist){
@@ -115,7 +147,7 @@
       if(!play.disabled){play.dataset.src=track.src;play.addEventListener('click',()=>playTrack(track));}row.append(play);list.append(row);
     }syncPlayer();
   }
-  function initPlayer(){const a=$('trackAudio');for(const event of ['play','pause','timeupdate','durationchange','loadedmetadata'])a.addEventListener(event,syncPlayer);a.addEventListener('ended',()=>{syncPlayer();moveTrack(1);});a.addEventListener('error',()=>{syncPlayer();toast('Этот аудиофайл не удалось загрузить');});$('playerToggle').addEventListener('click',()=>playTrack(currentTrack));$('playerPrev').addEventListener('click',()=>moveTrack(-1));$('playerNext').addEventListener('click',()=>moveTrack(1));$('playerSeek').addEventListener('input',()=>{if(Number.isFinite(a.duration))a.currentTime=Number($('playerSeek').value)*a.duration/1000;});}
+  function initPlayer(){const a=$('trackAudio');for(const event of ['play','pause','timeupdate','durationchange','loadedmetadata'])a.addEventListener(event,syncPlayer);for(const event of ['play','playing','pause','ended','emptied','error'])a.addEventListener(event,updateVisualizer);a.addEventListener('ended',()=>{syncPlayer();moveTrack(1);});a.addEventListener('error',()=>{syncPlayer();toast('Этот аудиофайл не удалось загрузить');});$('playerToggle').addEventListener('click',()=>playTrack(currentTrack));$('playerPrev').addEventListener('click',()=>moveTrack(-1));$('playerNext').addEventListener('click',()=>moveTrack(1));$('playerSeek').addEventListener('input',()=>{if(Number.isFinite(a.duration))a.currentTime=Number($('playerSeek').value)*a.duration/1000;});}
   async function loadTelegram() {
     try {
       let json;
@@ -132,6 +164,7 @@
       $('musicHint').textContent='✦ Telegram profile music · обновляется автоматически';
       renderBio();renderTracks();await renderAvatar();
     } catch (_) {
+      if(telegramData?.connected){$('musicHint').textContent='✦ Последняя библиотека · повторяем синхронизацию';return;}
       telegramData=null;
       $('musicHint').textContent='Синхронизация треков появится после подключения';
       renderBio();renderTracks();await renderAvatar();
@@ -150,7 +183,7 @@
       document.querySelector('.marquee-bar').hidden=standalone;
       $('gallery').hidden=!gallery;$('exitGalaxy').hidden=!exit;
       panel.hidden=!music;siblings.forEach(el=>{el.hidden=music;});
-      if(standalone)window.scrollTo(0,0);
+      if(standalone||music)window.scrollTo(0,0);requestAnimationFrame(updateVisualizer);
       if(music)tab.setAttribute('aria-current','page');else tab.removeAttribute('aria-current');
       document.querySelectorAll('.nav-link').forEach(a=>a.classList.toggle('active',!music&&(a.getAttribute('href')===(hash==='#top'||!hash?'#profile':hash))));
     }
@@ -161,8 +194,8 @@
     window.addEventListener('hashchange',()=>route(location.hash));
     $('sidebarPlay')?.addEventListener('click',startRadio);$('radioStart')?.addEventListener('click',startRadio);
     route(location.hash);
-    window.addEventListener('hashchange',()=>{if(!document.getElementById('music').hidden&&!$('trackAudio').paused)activateVisualizer();});
-    $('trackAudio').addEventListener('playing',activateVisualizer);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!$('trackAudio').paused)activateVisualizer();});
+    window.addEventListener('hashchange',updateVisualizer);
+    $('trackAudio').addEventListener('playing',activateVisualizer);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!$('trackAudio').paused)activateVisualizer();else updateVisualizer();});window.addEventListener('resize',updateVisualizer);
   }
   async function init(){initPlayer();initMusicTab();renderProfile();$('year').textContent=new Date().getFullYear();
     document.querySelectorAll('.nav-link').forEach(a=>a.addEventListener('click',()=>{document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));a.classList.add('active');}));
