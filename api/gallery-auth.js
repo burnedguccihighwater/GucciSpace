@@ -46,4 +46,8 @@ export function createAuthHandler({
   };
 }
 
-export default createAuthHandler();
+// The public site no longer supports owner login or changes.
+export default function retiredAuth(req, res) {
+  res.setHeader('Cache-Control', 'no-store');
+  return res.status(410).json({ error: 'authorization_removed' });
+}
