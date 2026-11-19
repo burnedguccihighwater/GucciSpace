@@ -34,11 +34,28 @@ function makeGroup(games, duplicate = false) {
     const art = document.createElement('div'); art.className = 'game-art';
     const fallback = document.createElement('span'); fallback.textContent = 'GAME'; fallback.setAttribute('aria-hidden', 'true');
     const img = document.createElement('img');
-    img.src = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.appid}/header.jpg`;
+    const base = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.appid}/`;
+    const legacy = `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appid}/`;
+    const covers = [
+      { src: base + 'library_600x900.jpg', portrait: true },
+      { src: legacy + 'library_600x900.jpg', portrait: true },
+      { src: base + 'header.jpg', portrait: false },
+      { src: legacy + 'header.jpg', portrait: false }
+    ];
     img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
-    img.width = 460; img.height = 215;
-    img.addEventListener('error', () => img.remove(), { once: true });
+    let coverIndex = 0;
+    function useCover() {
+      const cover = covers[coverIndex];
+      if (!cover) { img.remove(); return; }
+      art.classList.toggle('game-art-landscape', !cover.portrait);
+      img.width = cover.portrait ? 600 : 460;
+      img.height = cover.portrait ? 900 : 215;
+      img.src = cover.src;
+    }
+    img.addEventListener('error', () => { coverIndex++; useCover(); });
+    fallback.textContent = game.name;
     art.append(fallback, img);
+    useCover();
     const name = document.createElement('strong'); name.className = 'game-name';
     name.textContent = game.name; name.title = game.name;
     card.append(art, name); item.append(card); group.append(item);
