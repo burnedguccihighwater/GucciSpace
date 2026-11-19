@@ -40,20 +40,8 @@
     });
     return dbPromise;
   }
-  async function putMedia(item){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction('media','readwrite');tx.objectStore('media').put(item);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
   async function getMedia(id){const db=await openDB();return new Promise((res,rej)=>{const req=db.transaction('media').objectStore('media').get(id);req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error);});}
-  async function allMedia(){const db=await openDB();return new Promise((res,rej)=>{const req=db.transaction('media').objectStore('media').getAll();req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error);});}
-  async function deleteMedia(id){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction('media','readwrite');tx.objectStore('media').delete(id);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
-  async function clearMedia(){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction('media','readwrite');tx.objectStore('media').clear();tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
-  async function renderAvatar(){if(avatarURL){URL.revokeObjectURL(avatarURL);avatarURL=null;}const rec=await getMedia('avatar');const el=$('avatarDisplay');el.replaceChildren();if(rec?.blob){avatarURL=URL.createObjectURL(rec.blob);const img=document.createElement('img');img.src=avatarURL;img.alt='Фото профиля';el.append(img);}else if (telegramData?.connected && (telegramData.avatar==='/api/telegram-avatar' || /^assets\/telegram\/[a-zA-Z0-9_.-]+$/.test(telegramData.avatar || ''))) { const img=document.createElement('img');img.src=telegramData.avatar+'?v='+encodeURIComponent(telegramData.synced_at||'');img.alt='Аватар профиля';el.append(img); }else{const img=document.createElement('img');img.src='assets/profile-avatar.jpg';img.alt='Фото профиля';el.append(img);}}
-  async function renderGallery(){window.dispatchEvent(new Event('gucci:gallery-drafts'));}
-  function showEditor(){$('syncBioToggle').checked=useTelegramBio;Object.keys(defaultProfile).forEach(k=>{const field=$('edit'+k[0].toUpperCase()+k.slice(1));if(field)field.value=profile[k]||'';});$('editFeedback').textContent='';$('editorBackdrop').hidden=false;document.body.style.overflow='hidden';$('editName').focus();}
-  function hideEditor(){$('editorBackdrop').hidden=true;document.body.style.overflow='';}
-  async function mediaToDataURL(blob){return await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(blob);});}
-  function dataURLToBlob(data){const [meta,body]=data.split(',');if(!meta||!body||!/^data:image\//.test(meta))throw Error('Invalid image');const type=meta.match(/^data:([^;]+)/)?.[1]||'image/png';const bin=atob(body);const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return new Blob([bytes],{type});}
-  async function exportBackup(){try{const rows=await allMedia();const media=[];for(const rec of rows){media.push({id:rec.id,name:rec.name||'',created:rec.created||0,publishedId:rec.publishedId||null,data:await mediaToDataURL(rec.blob)});}const data=JSON.stringify({version:1,profile,media},null,2);const blob=new Blob([data],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='my-space-backup.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);$('editFeedback').textContent='Резервная копия скачана ♡';}catch(e){console.error(e);$('editFeedback').textContent='Не удалось создать копию.';}}
-  async function importBackup(file){try{if(file.size>80*1024*1024)throw Error('Too big');const data=JSON.parse(await file.text());if(data?.version!==1||!data.profile||!Array.isArray(data.media))throw Error('Invalid backup');const restored=safeProfile(data.profile);const rows=data.media.map(rec=>({id:rec.id,name:String(rec.name||''),created:Number(rec.created)||Date.now(),publishedId:typeof rec.publishedId==='string'?rec.publishedId:null,blob:dataURLToBlob(rec.data)}));await clearMedia();for(const rec of rows)await putMedia(rec);profile=restored;localStorage.setItem(key,JSON.stringify(profile));renderProfile();renderTracks();await Promise.all([renderGallery(),renderAvatar()]);hideEditor();toast('Страничка восстановлена из копии ♡');}catch(e){console.error(e);$('editFeedback').textContent='Не удалось открыть копию. Проверь файл JSON.';}}
-
+  async function renderAvatar(){if(avatarURL){URL.revokeObjectURL(avatarURL);avatarURL=null;}const rec=await getMedia('avatar').catch(()=>null);const el=$('avatarDisplay');el.replaceChildren();if(rec?.blob){avatarURL=URL.createObjectURL(rec.blob);const img=document.createElement('img');img.src=avatarURL;img.alt='Фото профиля';el.append(img);}else if (telegramData?.connected && (telegramData.avatar==='/api/telegram-avatar' || /^assets\/telegram\/[a-zA-Z0-9_.-]+$/.test(telegramData.avatar || ''))) { const img=document.createElement('img');img.src=telegramData.avatar+'?v='+encodeURIComponent(telegramData.synced_at||'');img.alt='Аватар профиля';el.append(img); }else{const img=document.createElement('img');img.src='assets/profile-avatar.jpg';img.alt='Фото профиля';el.append(img);}}
   function validAudio(src){return typeof src==='string' && (/^\/api\/telegram-media\?kind=audio&id=[a-f0-9]{32}$/.test(src)||/^assets\/telegram\/[a-zA-Z0-9_.-]+\.(mp3|ogg|m4a|aac|wav)$/i.test(src));}
   function validCover(src){return typeof src==='string' && /^\/api\/telegram-media\?kind=cover&id=[a-f0-9]{32}$/.test(src);}
   let currentTrack=null,playlist=[];
@@ -110,12 +98,10 @@
       if(!json || json.connected!==true || !Array.isArray(json.tracks)) throw new Error('Invalid data');
       telegramData=json;
       $('musicHint').textContent='✦ Telegram profile music · обновляется автоматически';
-      $('syncStatus').textContent='Подключено · последняя синхронизация: '+(json.synced_at ? new Date(json.synced_at).toLocaleString('ru-RU'):'нет данных')+'. Треков: '+json.tracks.length+'.';
       renderBio();renderTracks();await renderAvatar();
     } catch (_) {
       telegramData=null;
       $('musicHint').textContent='Синхронизация треков появится после подключения';
-      $('syncStatus').textContent='Не подключено. Для синхронизации нужен серверный модуль Telegram.';
       renderBio();renderTracks();await renderAvatar();
     }
   }
@@ -138,13 +124,8 @@
     route(location.hash);
   }
   async function init(){initPlayer();initMusicTab();renderProfile();$('year').textContent=new Date().getFullYear();
-    $('editOpen').addEventListener('click',showEditor);$('editClose').addEventListener('click',hideEditor);$('editorBackdrop').addEventListener('click',e=>{if(e.target===$('editorBackdrop'))hideEditor();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('editorBackdrop').hidden)hideEditor();});
-    $('editForm').addEventListener('submit',e=>{e.preventDefault();const next={};for(const field of Object.keys(defaultProfile)){const input=$('edit'+field[0].toUpperCase()+field.slice(1));next[field]=(input?.value||'').trim();}profile=next;useTelegramBio=$('syncBioToggle').checked;localStorage.setItem('gucci-space-use-tg-bio',String(useTelegramBio));localStorage.setItem(key,JSON.stringify(profile));renderProfile();renderTracks();hideEditor();toast('Изменения сохранены ♡');});
-    $('avatarInput').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file||!file.type.startsWith('image/'))return;try{await putMedia({id:'avatar',name:file.name,created:Date.now(),blob:file});await renderAvatar();$('editFeedback').textContent='Фото профиля сохранено ♡';}catch(err){console.error(err);$('editFeedback').textContent='Не удалось сохранить фото.';}e.target.value='';});
-    $('removeAvatar').addEventListener('click',async()=>{await deleteMedia('avatar');await renderAvatar();$('editFeedback').textContent='Фото профиля удалено.';});
-    $('exportBackup').addEventListener('click',exportBackup);$('importBackup').addEventListener('change',async e=>{const file=e.target.files?.[0];if(file)await importBackup(file);e.target.value='';});
     document.querySelectorAll('.nav-link').forEach(a=>a.addEventListener('click',()=>{document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));a.classList.add('active');}));
-    try{await Promise.all([renderGallery(),renderAvatar()]);await loadTelegram();setInterval(loadTelegram,180000);}catch(e){console.error(e);toast('Браузер не разрешил локальное хранение изображений.');}
+    renderAvatar().catch(console.error);await loadTelegram();setInterval(loadTelegram,180000);
   }
   init();
 })();
